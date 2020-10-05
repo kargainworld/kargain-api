@@ -9,7 +9,7 @@
   "builds": [
     {
       "src": "dist/index.js",
-      "use": "@now/node-server"
+      "use": "@vercel/node"
     }
   ]
 }
