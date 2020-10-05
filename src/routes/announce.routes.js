@@ -1,6 +1,5 @@
 const router = require('express').Router()
 const cors = require('cors')
-const config = require('../config')
 const corsMiddleware = require('../middlewares/cors.middleware')
 const passportMiddleware = require('../middlewares/passport')
 const authMiddleware = require('../middlewares/auth.middleware')

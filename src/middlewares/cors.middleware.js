@@ -1,6 +1,5 @@
 const config = require('../config')
 const Errors = require('../utils/errors')
-const logger = require('../services/logger')
 
 function corsOptions (allowCredentials = false) {
     return {
