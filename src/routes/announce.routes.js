@@ -40,14 +40,9 @@ router.get('/search',
 )
 
 router.get('/count',
-    cors(corsMiddleware.authedCors),
+    corsMiddleware.manualCors,
     authMiddleware.byPassAuth(),
     announceController.filterAnnouncesAction(false, false, true)
-)
-
-router.get('/user/:uid',
-    cors(),
-    announceController.getAnnouncesByUserAction
 )
 
 router.get('/slug/:slug',
