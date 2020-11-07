@@ -20,7 +20,6 @@ module.exports = {
 	'http://localhost:3000',
 	'http://localhost:5000',
 	'https://kargain.com',
-	'https://api.kargain.com/',
 	'https://kargain-api-nine.vercel.app',
 	'https://kargainapi.kargainworld.vercel.app',
 	'https://kargain-app.kargainworld.vercel.app'
