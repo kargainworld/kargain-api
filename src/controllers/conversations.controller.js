@@ -64,10 +64,11 @@ exports.getConversationsWithProfile = async (req, res, next) => {
 }
 
 exports.postConversationMessage = async (req, res, next) => {
+    const { message, recipientId } = req.body
+
     if (!req.user) {return next(Errors.UnAuthorizedError(Messages.errors.user_not_found))}
     if (!recipientId) {return next(Errors.UnAuthorizedError(Messages.errors.user_not_found))}
 
-    const { message, recipientId } = req.body
     try {
         const conversation = await ConversationModel.findOneAndUpdate(
             { $or: [
