@@ -6,6 +6,13 @@ const commentController = require('../controllers/comments.controller')
 const corsMiddleware = require('../middlewares/cors.middleware')
 const rolesMiddleware = require('../middlewares/roles.middleware')
 
+routes.get('/complaints',
+    corsMiddleware.manualCors,
+    passportMiddleware.authenticate('cookie', { session: false }),
+    rolesMiddleware.grantAccess('readAny', 'comment'),
+    commentController.getCommentsWithComplaints
+)
+
 routes.get('/:announce_id',
     corsMiddleware.manualCors,
     passportMiddleware.authenticate('cookie', { session: false }),
@@ -67,6 +74,20 @@ routes.put('/response/unlike/:comment_id/:responseIndex/:likeIndex',
     corsMiddleware.manualCors,
     passportMiddleware.authenticate('cookie', { session: false }),
     commentController.removeCommentResponseLike
+)
+
+routes.options('/:comment_id', cors(corsMiddleware.authedCors)) // enable pre-flights
+routes.delete('/:comment_id',
+    corsMiddleware.manualCors,
+    passportMiddleware.authenticate('cookie', { session: false }),
+    commentController.removeComment
+)
+
+routes.options('/complaints/:comment_id', cors(corsMiddleware.authedCors)) // enable pre-flights
+routes.put('/complaints/:comment_id',
+    corsMiddleware.manualCors,
+    passportMiddleware.authenticate('cookie', { session: false }),
+    commentController.addCommentComplaint
 )
 
 module.exports = routes
