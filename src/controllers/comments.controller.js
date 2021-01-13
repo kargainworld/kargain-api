@@ -21,7 +21,7 @@ exports.createComment = async (req, res, next) => {
     try {
         const comment = new CommentModel({
             announce: announce_id,
-            user: req.user.id,
+            user: req.user,
             message
         })
 
