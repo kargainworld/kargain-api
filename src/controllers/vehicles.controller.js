@@ -1,3 +1,4 @@
+const _ = require('lodash')
 const mongoose = require('mongoose')
 const slugify = require('@sindresorhus/slugify')
 const Errors = require('../utils/errors')
@@ -400,11 +401,16 @@ exports.getCarsMakeModelTrimYears = async (req, res, next) => {
         const trimsYears = await carsModelsModel.find(query
             ,{year : 1}
         )
+
+        const fromDoc = (key) => (doc) => doc.toObject()[key]
         
         return res.json({
             success: true,
             query,
-            data: trimsYears
+            data: _.sortBy(
+                _.uniqBy(trimsYears, fromDoc('year')),
+                fromDoc('year')
+            )
         })
     } catch (err) {
         return next(err)

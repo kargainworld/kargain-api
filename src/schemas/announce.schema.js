@@ -108,10 +108,12 @@ const AnnounceSchema = new mongoose.Schema({
         label: String,
         value: String
     },
- 
+
     vehicleEngineCylinder: {
-        value: String,
-        label: Number
+        type: Number,
+        default: 10,
+        min: 10,
+        max: 100000
     },
     
     makeRef: {

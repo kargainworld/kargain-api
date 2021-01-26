@@ -11,6 +11,11 @@ exports.getCommentsByAnnounce = async (req, res, next) => {
     return res.json({ success: true, data: comments })
 }
 
+exports.getCommentsWithComplaints = async (req, res, next) => {
+    const comments = await CommentModel.find({ complaints: true }, err => console.error(err)).exec()
+    return res.json({ success: true, data: comments })
+}
+
 exports.createComment = async (req, res, next) => {
     if (!req.user) {return next(Errors.UnAuthorizedError(Messages.errors.user_not_found))}
     const { announce_id, message } = req.body
@@ -21,7 +26,7 @@ exports.createComment = async (req, res, next) => {
     try {
         const comment = new CommentModel({
             announce: announce_id,
-            user: req.user.id,
+            user: req.user,
             message
         })
 
@@ -152,6 +157,19 @@ exports.removeCommentResponseLike = async (req, res, next) => {
     const response = comment.responses && comment.responses[responseIndex]
     if (!response) {return next(Errors.NotFoundError(Messages.errors.response_not_found))}
     response.likes = response.likes.slice(0, likeIndex).concat(comment.likes.slice(likeIndex + 1, response.likes.length))
+
+    const document = await comment.save()
+    return res.json({ success: true, data: document })
+}
+
+exports.addCommentComplaint = async (req, res, next) => {
+    if (!req.user) {return next(Errors.UnAuthorizedError(Messages.errors.user_not_found))}
+    const { comment_id: commentId, responseIndex, likeIndex } = req.params
+
+    const comment = await CommentModel.findById(commentId).exec()
+    if (!comment) {return next(Errors.NotFoundError(Messages.errors.comment_not_found))}
+
+    comment.complaints = true
 
     const document = await comment.save()
     return res.json({ success: true, data: document })

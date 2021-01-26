@@ -21,7 +21,11 @@ const CommentSchema = new mongoose.Schema({
         default: true
     },
     responses: [AnswerSchema],
-    likes : [LikeSchema]
+    likes : [LikeSchema],
+    complaints: {
+        type: Boolean,
+        default: false
+    }
 }, {
     timestamps: true,
     toJSON: { virtuals: true },

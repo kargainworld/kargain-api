@@ -355,7 +355,7 @@ exports.createAnnounceAction = async (req, res, next) => {
 
         const announce = new AnnounceModel(data)
         const doc = await announce.save()
-        await UserModel.updateOne(
+        await UserModel.findOneAndUpdate(
             { _id: req.user.id },
             {
                 $addToSet: {
@@ -364,7 +364,7 @@ exports.createAnnounceAction = async (req, res, next) => {
             }
         )
 
-        const announce_link = `${config.frontend}/announces/${doc.slug}`
+        const announce_link = `${config.frontend}/announces/${doc.toObject().slug}`
 
         await AnnounceMailer.confirmCreateAnnounce({
             email: req.user.email,
@@ -404,7 +404,7 @@ exports.updateAnnounceAction = async (req, res, next) => {
     }, {})
 
     try {
-        const doc = await AnnounceModel.updateOne(
+        const doc = await AnnounceModel.findOneAndUpdate(
             { slug: req.params.slug },
             { $set: updatesSet },
             {
@@ -414,7 +414,7 @@ exports.updateAnnounceAction = async (req, res, next) => {
             }
         )
 
-        const announce_link = `${config.frontend}/announces/${doc.slug}`
+        const announce_link = `${config.frontend}/announces/${doc.toObject().slug}`
         await notifier.postNotification({
             uid : req.user.id,
             message : 'Announce updated',
@@ -472,7 +472,7 @@ exports.updateAdminAnnounceAction = async (req, res, next) => {
             })
             .populate('user')
 
-        const announce_link = `${config.frontend}/announces/${doc.slug}`
+        const announce_link = `${config.frontend}/announces/${doc.toObject().slug}`
         if (activated) {
 
             //send activation success mail to announce owner
@@ -540,7 +540,7 @@ exports.addUserLikeActionAction = async (req, res, next) => {
     if (!req.user) {return next(Errors.UnAuthorizedError(Messages.errors.user_not_found))}
     const { announce_id } = req.params
     try {
-        const updatedAnnounce = await AnnounceModel.updateOne(
+        const updatedAnnounce = await AnnounceModel.findOneAndUpdate(
             { _id: announce_id },
             { $addToSet: { likes: { user: mongoose.Types.ObjectId(req.user.id) } } },
             {
@@ -555,7 +555,7 @@ exports.addUserLikeActionAction = async (req, res, next) => {
             { runValidators: true }
         )
 
-        const announce_link = `${config.frontend}/announces/${updatedAnnounce.slug}`
+        const announce_link = `${config.frontend}/announces/${updatedAnnounce.toObject().slug}`
         await notifier.postNotification({
             uid : updatedAnnounce.user,
             message : 'Announce updated',
@@ -603,13 +603,13 @@ exports.mailToShareAnnounce = async (req, res, next) => {
     if(!req.body.email) {return Errors.Error(Messages.errors.missing_or_invalid_email)}
 
     try {
-        const announce = await AnnounceModel.findOne({ slug: req.params.slug })
+        const announce = await AnnounceModel.findOneAndUpdate({ slug: req.params.slug })
         if(!announce) {return Errors.NotFoundError(Messages.errors.announce_not_found)}
 
         await AnnounceMailer.shareAnnounceLink({
             fromFullName: req.user.fullname,
             emailTo: req.body.email,
-            announce_link: `${config.frontend}/announces/${announce.slug}`,
+            announce_link: `${config.frontend}/announces/${announce.toObject().slug}`,
             featured_img_link: announce?.images?.[0]?.location ?? 'https://kargain.s3.eu-west-3.amazonaws.com/uploads/2020/05/30670681-d44d-468e-bf82-533733bb507e.JPG'
         })
 
