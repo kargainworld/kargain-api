@@ -113,7 +113,7 @@ const AnnounceSchema = new mongoose.Schema({
         type: Number,
         default: 10,
         min: 10,
-        max: 1000
+        max: 100000
     },
     
     makeRef: {
