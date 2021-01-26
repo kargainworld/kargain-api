@@ -4,106 +4,106 @@ const LikeSchema = require('./like.schema')
 const utils = require('../utils/helpers')
 
 const AnnounceSchema = new mongoose.Schema({
- 
+
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
         // autopopulate: { maxDepth: 1 }
     },
- 
+
     title: {
         type: String,
         trim: true
     },
- 
+
     showCellPhone: {
         type: Boolean,
         default: true
     },
- 
+
     //need admin validation
     activated: {
         type: Boolean,
         default: false
     },
- 
+
     //draft mode
     visible: {
         type: Boolean,
         default: true
     },
- 
+
     status: {
         type: String,
         enum: ['rejected', 'deleted', 'archived', 'active'],
         default: 'active'
     },
- 
+
     description: {
         type: String,
         trim: true
     },
- 
+
     expirationDate: {
         type: Date
     },
- 
+
     slug: {
         type: String,
         trim: true
     },
- 
+
     price: {
         type: Number,
         default: 0,
         min: 0,
         max: 999999
     },
- 
+
     vinNumber: String,
- 
+
     adType: {
         type: String,
         required: true,
         enum : ['sale', 'sale-pro', 'rent']
     },
- 
+
     // car, moto etc ...
     vehicleType: {
         type: String,
         required: true,
         enum : ['car', 'moto', 'bus', 'camper', 'utility']
     },
- 
+
     // e:g moto => quad, scooter ...
     vehicleFunctionType: {
         label: String,
         value: String
     },
- 
+
     // neuf, occas
     vehicleGeneralState: {
         label: String,
         value: String
     },
- 
+
     // personal, taxi, driving-school ...
     vehicleFunctionUse: {
         label: String,
         value: String
     },
- 
+
     // taxi, personal
     vehicleFunction: {
         label: String,
         value: String
     },
- 
+
     vehicleEngineType: {
         label: String,
         value: String
     },
- 
+
     vehicleEngineGas: {
         label: String,
         value: String
@@ -115,19 +115,19 @@ const AnnounceSchema = new mongoose.Schema({
         min: 10,
         max: 100000
     },
-    
+
     makeRef: {
         type: String,
         required: true,
         enum: ['buses_makes', 'campers_makes', 'cars_makes', 'motorcycles_makes', 'trucks_makes']
     },
-    
+
     modelRef: {
         type: String,
         required: true,
         enum: ['buses_models', 'campers_models', 'cars_models', 'motorcycles_models', 'trucks_models']
     },
-    
+
     manufacturer: {
         make: {
             type: mongoose.Schema.Types.ObjectId,
@@ -148,44 +148,75 @@ const AnnounceSchema = new mongoose.Schema({
             value: String
         }
     },
- 
+
+    version: {
+        type: String,
+        default: ''
+    },
+
+    functionHour: {
+        type: Number,
+        default: 0,
+        min: 0,
+        max: 99999999
+    },
+
+    weight: {
+        type: Number,
+        default: 0,
+        min: 0,
+        max: 99999
+    },
+
+    chassisNumber: {
+        type: Number,
+        default: 0,
+        min: 0,
+        max: 99999999999999999999
+    },
+
+    accidentVehicle: {
+        label: Number,
+        value: Number
+    },
+
     mileage: {
         type: Number,
         default: 0,
         min: 0,
         max: 999999
     },
- 
+
     powerKm: {
         type: Number,
         default: 0
     },
- 
+
     powerCh: {
         type: Number,
         default: 0
     },
- 
+
     consumptionMixt: {
         type: Number,
         default: 0
     },
- 
+
     consumptionCity: {
         type: Number,
         default: 0
     },
- 
+
     consumptionRoad: {
         type: Number,
         default: 0
     },
- 
+
     consumptionGkm: {
         type: Number,
         default: 0
     },
- 
+
     equipments: [
         {
             _id: false,
@@ -193,12 +224,12 @@ const AnnounceSchema = new mongoose.Schema({
             value: String
         }
     ],
- 
+
     ownersCount: {
         label: String,
         value: String
     },
- 
+
     damages: [
         {
             _id: false,
@@ -212,49 +243,49 @@ const AnnounceSchema = new mongoose.Schema({
             }
         }
     ],
- 
+
     doors: {
         label: String,
         value: String
     },
- 
+
     seats: {
         label: String,
         value: String
     },
-    
+
     //essieux (utility)
     axles : {
         label: String,
         value: String
     },
-    
+
     driverCabins: {
         label: String,
         value: String
     },
- 
+
     bunks: {
         label: String,
         value: String
     },
- 
+
     beds: {
         label: String,
         value: String
     },
- 
+
     bedType: {
         label: String,
         value: String
     },
- 
+
     paint: {},
     materials: {},
     externalColor: {},
     internalColor: {},
     emission: {},
- 
+
     location: {
         coordinates: {
             type: [Number],
@@ -266,12 +297,12 @@ const AnnounceSchema = new mongoose.Schema({
             default: 'Point'
         }
     },
- 
+
     countrySelect: {
         label: String,
         value: String
     },
- 
+
     address: {
         housenumber: Number,
         street: {
@@ -291,28 +322,28 @@ const AnnounceSchema = new mongoose.Schema({
             trim: true
         }
     },
- 
+
     images: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Media',
         autopopulate: true
     }],
- 
+
     tags: [{
         index: true,
         _id: false,
         type: String
     }],
- 
+
     comments: [
         {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Comment'
         }
     ],
- 
-    likes: [LikeSchema]
- 
+
+    likes: [LikeSchema],
+
 }, {
     timestamps: true,
     toJSON: { virtuals: true },
