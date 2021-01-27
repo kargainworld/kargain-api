@@ -3,12 +3,12 @@
   "routes": [
     {
       "src": "/.*",
-      "dest": "src/index.js"
+      "dest": "dist/index.js"
     }
   ],
   "builds": [
     {
-      "src": "src/index.js",
+      "src": "dist/index.js",
       "use": "@now/node-server"
     }
   ]
