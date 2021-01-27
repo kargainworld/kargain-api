@@ -5,5 +5,11 @@
       "src": "/.*",
       "dest": "dist/index.js"
     }
+  ],
+  "builds": [
+    {
+      "src": "dist/index.js",
+      "use": "@now/node-server"
+    }
   ]
 }
