@@ -430,16 +430,6 @@ exports.updateAnnounceAction = async (req, res, next) => {
 exports.removeAnnounceAction = async (req, res, next) => {
     if (!req.user) {return next(Errors.UnAuthorizedError(Messages.errors.user_not_found))}
     try {
-        // const doc = await AnnounceModel.updateOne(
-        //     { slug: req.params.slug },
-        //     { $set: { status: 'deleted' } },
-        //     {
-        //         returnNewDocument: true,
-        //         runValidators: true,
-        //         context: 'query'
-        //     }
-        // )
-
         const document = await AnnounceModel.findOneAndDelete({ slug: req.params.slug }).exec()
 
         await notifier.postNotification({
