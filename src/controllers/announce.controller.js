@@ -399,7 +399,7 @@ exports.updateAnnounceAction = async (req, res, next) => {
 
     const updatesSet = allowedFieldsUpdatesSet.reduce((carry, key) => {
         const value = functions.resolveObjectKey(req.body, key)
-        if (value) {return { ...carry, [key]: value }}
+        if (typeof value !== 'undefined') {return { ...carry, [key]: value }}
         else {return carry}
     }, {})
 
@@ -430,22 +430,14 @@ exports.updateAnnounceAction = async (req, res, next) => {
 exports.removeAnnounceAction = async (req, res, next) => {
     if (!req.user) {return next(Errors.UnAuthorizedError(Messages.errors.user_not_found))}
     try {
-        const doc = await AnnounceModel.updateOne(
-            { slug: req.params.slug },
-            { $set: { status: 'deleted' } },
-            {
-                returnNewDocument: true,
-                runValidators: true,
-                context: 'query'
-            }
-        )
+        const document = await AnnounceModel.findOneAndDelete({ slug: req.params.slug }).exec()
 
         await notifier.postNotification({
             uid : req.user.id,
             message : 'An announce had been removed'
         })
 
-        return res.json({ success: true, data: doc })
+        return res.json({ success: true, data: document })
     } catch (err) {
         return next(err)
     }

@@ -38,5 +38,6 @@ module.exports = [
     'address.street',
     'address.postCode',
     'address.country',
-    'address.city'
+    'address.city',
+    'visible'
 ]
