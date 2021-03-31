@@ -14,7 +14,7 @@ const db = mongoose.connection
 
 db.once('open', () => {
     console.log('Connected to mongo at ' + config.db.mongo_location)
-    const server = app.listen(config.port, 'localhost', function () {
+    const server = app.listen(config.port, '0.0.0.0', function () {
         const host = server.address().address
         const port = server.address().port
         console.log('There will be dragons http://' + host + ':' + port)
