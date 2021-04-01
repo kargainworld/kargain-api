@@ -1,12 +1,12 @@
 version: '3'
 
 services:
-  nodejs:
+  backend:
     build:
       context: .
       dockerfile: Dockerfile
-    image: nodejs
-    container_name: nodejs
+    image: timofeidomnikov/kargain-api
+    container_name: backend
     restart: unless-stopped
     env_file: .env
     ports:
