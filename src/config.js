@@ -19,11 +19,9 @@ module.exports = {
 	'http://localhost:8080',
 	'http://localhost:3000',
 	'http://localhost:5000',
+	'https://www.kargain.com',
 	'https://kargain.com',
 	'https://api.kargain.com',
-	'https://kargain-api-nine.vercel.app',
-	'https://kargain-api.kargainworld.vercel.app/',
-	'https://kargain-app.kargainworld.vercel.app'
     ],
     externalsAPI: {
 	vindecoderFree: {

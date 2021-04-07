@@ -1,26 +1,19 @@
 version: '3'
 
 services:
-  nodejs:
+  backend:
     build:
       context: .
       dockerfile: Dockerfile
-    image: nodejs
-    container_name: nodejs
+    image: ghcr.io/kargainworld/kargain-api
+    container_name: backend
     restart: unless-stopped
     env_file: .env
     ports:
-      - "80:8080"
-    volumes:
-      - .:/home/node/app
-      - node_modules:/home/node/app/node_modules
+      - "8080:8080"
     networks:
       - app-network
-    command: npm run start
 
 networks:
   app-network:
     driver: bridge
-
-volumes:
-  node_modules:

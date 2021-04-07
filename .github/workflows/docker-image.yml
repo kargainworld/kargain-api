@@ -1,0 +1,49 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build the Docker image
+        run: |
+          docker build . --file Dockerfile --tag ghcr.io/kargainworld/kargain-api:latest
+          echo ${GITHUB_TOKEN} | docker login -u kargainworld --password-stdin ghcr.io
+          docker push ghcr.io/kargainworld/kargain-api:latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  deploy:
+    needs: build
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Copy docker-compose.yml to the server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          port: ${{ secrets.PORT }}
+          source: "docker-compose.yml"
+          target: "/var/www/kargain-api"
+          overwrite: true
+      - name: Pull Docker image on the server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          port: ${{ secrets.PORT }}
+          script: |
+            cd /var/www/kargain-api
+            sudo echo ${{ secrets.GITHUB_TOKEN }} | sudo docker login -u kargainworld --password-stdin ghcr.io
+            sudo docker-compose pull backend
+            sudo docker-compose up -d --no-build
