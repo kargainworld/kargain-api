@@ -345,6 +345,10 @@ exports.createAnnounceAction = async (req, res, next) => {
                 ...req.body.address,
                 housenumber : Number(req.body?.address?.housenumber ?? null)
             },
+                location: {
+                coordinates: req.body?.location?.coordinates ?? [0, 0],
+                type: req.body?.location?.type ?? "Point"
+            },
             manufacturer : {
                 make : matchMake?._id,
                 model : matchModel?._id
