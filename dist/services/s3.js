@@ -42,9 +42,9 @@ function uploadObject(buffer, key) {
     };
     s3.upload(params, function (err, response) {
       if (err) {
-        reject(err);
+	reject(err);
       } else {
-        resolve(response);
+	resolve(response);
       }
     });
   });
@@ -62,10 +62,10 @@ function generateGetUrl(Key) {
 
     s3.getSignedUrl('getObject', params, function (err, url) {
       if (err) {
-        reject(err);
+	reject(err);
       } else {
-        // If there is no errors we will send back the pre-signed GET URL
-        resolve(url);
+	// If there is no errors we will send back the pre-signed GET URL
+	resolve(url);
       }
     });
   });
@@ -83,7 +83,7 @@ function generatePutUrl(Key, ContentType) {
 
     s3.getSignedUrl('putObject', params, function (err, url) {
       if (err) {
-        reject(err);
+	reject(err);
       } // If there is no errors we can send back the pre-signed PUT URL
 
 

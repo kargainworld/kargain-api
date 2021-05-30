@@ -27,56 +27,56 @@ function getConfig () {
 
 function uploadObject (buffer, key, contentType = 'image/jpeg', acl = 'public-read') {
     return new Promise((resolve, reject) => {
-        const params = {
-            Bucket,
-            Body: buffer,
-            Key: key,
-            ContentType: contentType,
-            ACL: acl
-        }
-        s3.upload(params, (err, response) => {
-            if (err) {
-                reject(err)
-            } else {
-                resolve(response)
-            }
-        })
+	const params = {
+	    Bucket,
+	    Body: buffer,
+	    Key: key,
+	    ContentType: contentType,
+	    ACL: acl
+	}
+	s3.upload(params, (err, response) => {
+	    if (err) {
+		reject(err)
+	    } else {
+		resolve(response)
+	    }
+	})
     })
 }
 
 // GET URL Generator
 function generateGetUrl (Key) {
     return new Promise((resolve, reject) => {
-        const params = {
-            Bucket,
-            Key,
-            Expires: 120 // 2 minutes
-        }
-        // Note operation in this case is getObject
-        s3.getSignedUrl('getObject', params, (err, url) => {
-            if (err) {
-                reject(err)
-            } else {
-                // If there is no errors we will send back the pre-signed GET URL
-                resolve(url)
-            }
-        })
+	const params = {
+	    Bucket,
+	    Key,
+	    Expires: 120 // 2 minutes
+	}
+	// Note operation in this case is getObject
+	s3.getSignedUrl('getObject', params, (err, url) => {
+	    if (err) {
+		reject(err)
+	    } else {
+		// If there is no errors we will send back the pre-signed GET URL
+		resolve(url)
+	    }
+	})
     })
 }
 
 // PUT URL Generator
 function generatePutUrl (Key, ContentType) {
     return new Promise((resolve, reject) => {
-        // Note Bucket is retrieved from the env variable above.
-        const params = { Bucket, Key, ContentType }
-        // Note operation in this case is putObject
-        s3.getSignedUrl('putObject', params, function (err, url) {
-            if (err) {
-                reject(err)
-            }
-            // If there is no errors we can send back the pre-signed PUT URL
-            resolve(url)
-        })
+	// Note Bucket is retrieved from the env variable above.
+	const params = { Bucket, Key, ContentType }
+	// Note operation in this case is putObject
+	s3.getSignedUrl('putObject', params, function (err, url) {
+	    if (err) {
+		reject(err)
+	    }
+	    // If there is no errors we can send back the pre-signed PUT URL
+	    resolve(url)
+	})
     })
 }
 
