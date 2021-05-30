@@ -6,12 +6,11 @@
 	"repository": "https://github.com/kargainworld/kargain_api",
 	"main": "src",
 	"scripts": {
-		"vercel-build": "yarn run build",
 		"start": "cross-env NODE_ENV=development nodemon src",
 		"start:prod": "nodemon src",
 		"build": "rimraf dist && babel src -d dist",
 		"prod": "cross-env NODE_ENV=production yarn run build && nodemon dist",
-		"deploy": "yarn run build && vercel --prod",
+		"deploy": "yarn run build",
 		"eslint": "eslint --fix src"
 	},
 	"dependencies": {
