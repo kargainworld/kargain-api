@@ -15,7 +15,7 @@ const postNotification = ({
         const result = notificationModel.updateMany(
             { to : mongoose.Types.ObjectId(uid) },
             { $addToSet: { pings: { message, action } } },
-            { runValidators: true }
+            { runValidators: true, upsert: true }
         )
         
         return resolve(result)

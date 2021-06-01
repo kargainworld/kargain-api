@@ -6,7 +6,7 @@ const notificationsController = require('../controllers/notifications.controller
 
 router.get('/' )
 router.get('/',
-    
+    corsMiddleware.manualCors,
     passportMiddleware.authenticate('cookie', { session: false }),
     notificationsController.getCurrentUserNotifications
 )
