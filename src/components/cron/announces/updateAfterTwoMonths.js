@@ -21,14 +21,14 @@ cron.schedule('* * * * *', async () => {
             return doc
         }))
 
-        const emailsResults = await Promise.all(docs.map(async (doc) => {
-            return await AnnounceMailer.informDisabledAnnounce({
-                email: doc?.user?.email,
-                announce_title: doc.title,
-                announce_link: `${config.frontend}/announces/${doc.slug}`,
-                announce_creation_date: moment(doc.createdAt).format('dddd, MMMM Do YYYY, h:mm:ss a')
-            })
-        }))
+        // const emailsResults = await Promise.all(docs.map(async (doc) => {
+        //     return await AnnounceMailer.informDisabledAnnounce({
+        //         email: doc?.user?.email,
+        //         announce_title: doc.title,
+        //         announce_link: `${config.frontend}/announces/${doc.slug}`,
+        //         announce_creation_date: moment(doc.createdAt).format('dddd, MMMM Do YYYY, h:mm:ss a')
+        //     })
+        // }))
     }
     catch (err) {
         console.log(err)
