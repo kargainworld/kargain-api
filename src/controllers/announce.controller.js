@@ -337,7 +337,7 @@ exports.createAnnounceAction = async (req, res, next) => {
             ...req.body,
             user: req.user,
             title : manufacturerTitle,
-            activated: false,
+            activated: true,
             visible: disable,
             makeRef : `${vehicleType}s_makes`,
             modelRef : `${vehicleType}s_models`,
@@ -370,18 +370,18 @@ exports.createAnnounceAction = async (req, res, next) => {
 
         const announce_link = `${config.frontend}/announces/${doc.toObject().slug}`
 
-        await AnnounceMailer.confirmCreateAnnounce({
-            email: req.user.email,
-            firstname: req.user.firstname,
-            lastname: req.user.lastname,
-            announce_link: announce_link,
-            featured_img_link: doc?.images?.[0]?.location ?? 'https://kargain.s3.eu-west-3.amazonaws.com/uploads/2020/05/30670681-d44d-468e-bf82-533733bb507e.JPG',
-            manufacturer: {
-                make: doc?.manufacturer?.make?.label,
-                model: doc?.manufacturer?.model?.label,
-                generation: doc?.manufacturer?.generation?.label
-            }
-        })
+        // await AnnounceMailer.confirmCreateAnnounce({
+        //     email: req.user.email,
+        //     firstname: req.user.firstname,
+        //     lastname: req.user.lastname,
+        //     announce_link: announce_link,
+        //     featured_img_link: doc?.images?.[0]?.location ?? 'https://kargain.s3.eu-west-3.amazonaws.com/uploads/2020/05/30670681-d44d-468e-bf82-533733bb507e.JPG',
+        //     manufacturer: {
+        //         make: doc?.manufacturer?.make?.label,
+        //         model: doc?.manufacturer?.model?.label,
+        //         generation: doc?.manufacturer?.generation?.label
+        //     }
+        // })
 
         await notifier.postNotification({
             uid : req.user.id,
@@ -472,14 +472,14 @@ exports.updateAdminAnnounceAction = async (req, res, next) => {
         if (activated) {
 
             //send activation success mail to announce owner
-            await AnnounceMailer.successConfirmAnnounce({
-                title: doc.title,
-                email: doc.user.email,
-                firstname: doc.user.firstname,
-                lastname: doc.user.lastname,
-                announce_link: announce_link,
-                featured_img_link: doc?.images?.[0]?.location ?? 'https://kargain.s3.eu-west-3.amazonaws.com/uploads/2020/05/30670681-d44d-468e-bf82-533733bb507e.JPG'
-            })
+            // await AnnounceMailer.successConfirmAnnounce({
+            //     title: doc.title,
+            //     email: doc.user.email,
+            //     firstname: doc.user.firstname,
+            //     lastname: doc.user.lastname,
+            //     announce_link: announce_link,
+            //     featured_img_link: doc?.images?.[0]?.location ?? 'https://kargain.s3.eu-west-3.amazonaws.com/uploads/2020/05/30670681-d44d-468e-bf82-533733bb507e.JPG'
+            // })
 
             await notifier.postNotification({
                 uid : req.user.id,
@@ -489,12 +489,12 @@ exports.updateAdminAnnounceAction = async (req, res, next) => {
 
         } else {
             //send rejected activation mail to announce owner
-            await AnnounceMailer.rejectedConfirmAnnounce({
-                email: doc.user.email,
-                firstname: doc.user.firstname,
-                lastname: doc.user.lastname,
-                announce_link: announce_link
-            })
+            // await AnnounceMailer.rejectedConfirmAnnounce({
+            //     email: doc.user.email,
+            //     firstname: doc.user.firstname,
+            //     lastname: doc.user.lastname,
+            //     announce_link: announce_link
+            // })
 
             await notifier.postNotification({
                 uid : req.user.id,
@@ -602,12 +602,12 @@ exports.mailToShareAnnounce = async (req, res, next) => {
         const announce = await AnnounceModel.findOneAndUpdate({ slug: req.params.slug })
         if(!announce) {return Errors.NotFoundError(Messages.errors.announce_not_found)}
 
-        await AnnounceMailer.shareAnnounceLink({
-            fromFullName: req.user.fullname,
-            emailTo: req.body.email,
-            announce_link: `${config.frontend}/announces/${announce.toObject().slug}`,
-            featured_img_link: announce?.images?.[0]?.location ?? 'https://kargain.s3.eu-west-3.amazonaws.com/uploads/2020/05/30670681-d44d-468e-bf82-533733bb507e.JPG'
-        })
+        // await AnnounceMailer.shareAnnounceLink({
+        //     fromFullName: req.user.fullname,
+        //     emailTo: req.body.email,
+        //     announce_link: `${config.frontend}/announces/${announce.toObject().slug}`,
+        //     featured_img_link: announce?.images?.[0]?.location ?? 'https://kargain.s3.eu-west-3.amazonaws.com/uploads/2020/05/30670681-d44d-468e-bf82-533733bb507e.JPG'
+        // })
 
         return res.json({ success: true, data: { msg : 'sent' }})
 
