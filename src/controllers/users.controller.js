@@ -210,11 +210,12 @@ exports.uploadAvatar = async (req, res, next) => {
 
 exports.deleteUser = async (req, res, next) => {
     try {
-        const doc = await UserModel.updateOne(
-            { username: req.params.username },
-            { removed: true }
-        )
-        return res.json({ success: true, data: doc })
+        const username = req.params.username;
+        const doc = await UserModel.findOne({username});
+        await UserModel.deleteOne({username});
+        await AnnounceModel.deleteMany({ user: doc._id })
+        return res.json({ success: true })
+        // return res.json({ success: true, data: doc })
     } catch (err) {
         return next(err)
     }

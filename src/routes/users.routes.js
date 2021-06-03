@@ -87,11 +87,10 @@ router.post('/contact',
     cors(corsMiddleware.clientCors),
     usersController.contact
 )
-
+router.options('/:username', cors(corsMiddleware.clientCors))
 router.delete('/:username',
     corsMiddleware.manualCors,
     passportMiddleware.authenticate('cookie', { session: false }),
-    rolesMiddleware.grantAccess('deleteAny', 'profile'),
     usersController.deleteUser
 )
 
