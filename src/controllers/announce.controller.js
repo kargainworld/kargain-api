@@ -106,8 +106,8 @@ exports.filterAnnouncesAction = (fetchProfile = false, fetchFeed = false, return
 
         if(sortBy && sortOrder){
             sorters = {
-                [sortBy]: sortOrder,
-                ...sorters
+                ...sorters,
+                [sortBy]: sortOrder
             }
         }
     }
@@ -308,7 +308,7 @@ exports.createAnnounceAction = async (req, res, next) => {
     const { vehicleType, manufacturer } = req.body
 
     //automatically disable announce
-    const disable = req.user.garage.length >= req.user.config.garageLengthAllowed
+    // const disable = req.user.garage.length >= req.user.config.garageLengthAllowed
     const modelMake = require('../models').Vehicles.Makes[`${vehicleType}s`]
     const modelModel = require('../models').Vehicles.Models[`${vehicleType}s`]
     let matchMake = null
@@ -338,7 +338,7 @@ exports.createAnnounceAction = async (req, res, next) => {
             user: req.user,
             title : manufacturerTitle,
             activated: true,
-            visible: disable,
+            visible: true,
             makeRef : `${vehicleType}s_makes`,
             modelRef : `${vehicleType}s_models`,
             address : {
