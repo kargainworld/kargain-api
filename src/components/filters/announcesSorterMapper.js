@@ -3,7 +3,7 @@ module.exports = {
     PRICE: 'price',
     MILEAGE: 'mileage',
     DATE : 'createdAt',
-    POSITION : 'distanceRadius'
+    RADIUS : 'distanceRadius'
 }
 
 

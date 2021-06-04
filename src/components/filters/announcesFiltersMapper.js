@@ -30,6 +30,9 @@ module.exports = {
     GENERAL_STATE: {
         ref: 'vehicleGeneralState.value'
     },
+    COUNTRY_SELECT: {
+        ref: 'countrySelect.value'
+    },
     ADDRESS_CITY_POSTCODE: {
         ref : 'address.city.postcode'
     },
