@@ -1,5 +1,7 @@
 const AnnounceModel = require('../models').Announce
 const CommentModel = require('../models').Comment
+const config = require('../config')
+const notifier = require('../components/notifications/notifier')
 const Errors = require('../utils/errors')
 const Messages = require('../utils/messages')
 
@@ -32,7 +34,14 @@ exports.createComment = async (req, res, next) => {
 
         const doc = await comment.save()
         announce.comments.push(doc._id)
-        await announce.save()
+        const announceDoc = await announce.save()
+        const announce_link = `${config.frontend}/announces/${announceDoc.toObject().slug}`
+
+        await notifier.postNotification({
+            uid : announceDoc.user,
+            message : 'Comment Added',
+            action : announce_link
+        })
 
         return res.json({
             success: true,
