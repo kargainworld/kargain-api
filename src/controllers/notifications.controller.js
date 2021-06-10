@@ -1,7 +1,6 @@
 const Errors = require('../utils/errors')
 const Messages = require('../utils/messages')
 const notificationModel = require('../models').Notification
-var mongoose = require('mongoose');
 
 exports.getCurrentUserNotifications = async (req, res, next) => {
     if (!req.user) { return next(Errors.UnAuthorizedError(Messages.errors.user_not_found)) }
@@ -20,9 +19,8 @@ exports.getCurrentUserNotifications = async (req, res, next) => {
 exports.deleteCurrentUserNotifications = async (req, res, next) => {
     if (!req.user) { return next(Errors.UnAuthorizedError(Messages.errors.user_not_found)) }
     const { notificationId } = req.params
-    console.log(notificationId)
+    
     try {
-        // const notifications = await notificationModel.delet({ to: req.user.id }, { $pull: { 'pings._id': {$in: [notificationId]}} })
         let notification = await notificationModel.findOne({to: req.user.id})
         if(!notification) return next('No Data')
         
@@ -35,12 +33,23 @@ exports.deleteCurrentUserNotifications = async (req, res, next) => {
         return res.json({
             success: true,
             data: {
-                id: notificationId
+                id: notificationId,
+                count: 1
             }
         })
 
     } catch (err) {
         console.log(err)
         next(err)
+    }
+}
+
+exports.setOpenNotification = async ({id}) => {
+    if (!id) return Messages.errors.user_not_found
+
+    try {
+        await notificationModel.updateOne({to: id, 'pings.opened': false}, {'pings.opened': true})
+    } catch (err) {
+        console.log(err)
     }
 }

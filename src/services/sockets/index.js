@@ -1,6 +1,7 @@
 const Server = require('socket.io')
+const notificationsController = require('../../controllers/notifications.controller')
 
-Socket = {  }
+Socket = {}
 Socket.ids = new Array()
 
 Socket.init = (httpServer) => {
@@ -28,6 +29,10 @@ Socket.init = (httpServer) => {
 
         socket.on('connect_error', (err) => {
             console.error(err)
+        })
+
+        socket.on('OPENED_NOTIFICATION', () => {
+            notificationsController.setOpenNotification({ id: socket.userId })
         })
     })
 }

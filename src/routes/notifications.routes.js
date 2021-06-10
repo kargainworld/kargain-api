@@ -4,6 +4,7 @@ const passportMiddleware = require('../middlewares/passport')
 const corsMiddleware = require('../middlewares/cors.middleware')
 const notificationsController = require('../controllers/notifications.controller')
 
+
 router.get('/' )
 router.get('/',
     corsMiddleware.manualCors,
