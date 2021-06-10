@@ -37,19 +37,21 @@ exports.createComment = async (req, res, next) => {
         announce.comments.push(doc._id)
         const announceDoc = await announce.save()
         const announce_link = `${config.frontend}/announces/${announceDoc.toObject().slug}`
+        if (req.user.id !== announceDoc.user.toString()) {
+            await notifier.postNotification({
+                uid: announceDoc.user,
+                message: 'Comment Added',
+                action: announce_link
+            })
 
-        await notifier.postNotification({
-            uid: announceDoc.user,
-            message: 'Comment Added',
-            action: announce_link
-        })
+            // If sender is not owner
 
-        sockets.sendMessage("GET_NOTIFICATION", {
-            sender: req.user,
-            message: message,
-            action: announce_link
-        }, announce.user)
-
+            sockets.sendMessage("GET_NOTIFICATION", {
+                sender: req.user,
+                message: message,
+                action: announce_link
+            }, announce.user)
+        }
         return res.json({
             success: true,
             data: doc
