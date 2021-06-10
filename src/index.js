@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 const config = require('./config')
 const app = require('./app')
-
+const Sockets = require('./services/sockets');
 mongoose.Promise = global.Promise // set mongo up to use promises
 mongoose.set('debug', true)
 
@@ -11,7 +11,6 @@ mongoose.connect(config.db.mongo_location, { useCreateIndex: true, useNewUrlPars
     })
 
 const db = mongoose.connection
-
 db.once('open', () => {
     console.log('Connected to mongo at ' + config.db.mongo_location)
     const server = app.listen(config.port, '0.0.0.0', function () {
@@ -19,6 +18,8 @@ db.once('open', () => {
         const port = server.address().port
         console.log('There will be dragons http://' + host + ':' + port)
     })
+
+    Sockets.init(server)
 })
 
 db.on('error', console.error.bind(console, 'connection error:'))

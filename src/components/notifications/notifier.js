@@ -9,15 +9,15 @@ const postNotification = ({
     action
 }) => {
     return new Promise((resolve, reject) => {
-        if(!uid) { reject(Errors.NotFoundError(Messages.errors.missing_or_invalid_email))}
-        if (!message) { reject(Errors.NotFoundError('missing firstname'))}
-    
+        if (!uid) { reject(Errors.NotFoundError(Messages.errors.missing_or_invalid_email)) }
+        if (!message) { reject(Errors.NotFoundError('missing firstname')) }
+
         const result = notificationModel.updateMany(
-            { to : mongoose.Types.ObjectId(uid) },
+            { to: mongoose.Types.ObjectId(uid) },
             { $addToSet: { pings: { message, action } } },
             { runValidators: true, upsert: true }
         )
-        
+
         return resolve(result)
     })
 }
