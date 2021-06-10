@@ -10,7 +10,7 @@ router.get('/',
     passportMiddleware.authenticate('cookie', { session: false }),
     notificationsController.getCurrentUserNotifications
 )
-
+router.options('/:notificationId', cors(corsMiddleware.clientCors))
 router.delete('/:notificationId',
     corsMiddleware.manualCors,
     passportMiddleware.authenticate('cookie', { session: false }),
