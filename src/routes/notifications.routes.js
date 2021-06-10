@@ -11,4 +11,10 @@ router.get('/',
     notificationsController.getCurrentUserNotifications
 )
 
+router.delete('/:notificationId',
+    corsMiddleware.manualCors,
+    passportMiddleware.authenticate('cookie', { session: false }),
+    notificationsController.deleteCurrentUserNotifications
+)
+
 module.exports = router

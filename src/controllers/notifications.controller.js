@@ -3,14 +3,30 @@ const Messages = require('../utils/messages')
 const notificationModel = require('../models').Notification
 
 exports.getCurrentUserNotifications = async (req, res, next) => {
-    if (!req.user) {return next(Errors.UnAuthorizedError(Messages.errors.user_not_found))}
+    if (!req.user) { return next(Errors.UnAuthorizedError(Messages.errors.user_not_found)) }
     try {
-        const notifications = await notificationModel.findOne({ to : req.user.id })
-	    
+        const notifications = await notificationModel.findOne({ to: req.user.id })
+
         return res.json({
-            success : true,
-            data : notifications
+            success: true,
+            data: notifications
         })
+    } catch (err) {
+        next(err)
+    }
+}
+
+exports.deleteCurrentUserNotifications = async (req, res, next) => {
+    if (!req.user) { return next(Errors.UnAuthorizedError(Messages.errors.user_not_found)) }
+    const { notificationId } = req.params
+    try {
+        const notifications = await notificationModel.updateOne({ to: req.user.id }, { $pullAll: { _id: notificationId } })
+
+        return res.json({
+            success: true,
+            data: notifications
+        })
+        
     } catch (err) {
         next(err)
     }
