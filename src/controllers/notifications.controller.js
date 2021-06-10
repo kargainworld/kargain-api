@@ -30,11 +30,13 @@ exports.deleteCurrentUserNotifications = async (req, res, next) => {
             return ping._id.toString() !== notificationId
         })
 
-        const notifications = await notificationModel.updateOne({to: req.user.id}, {pings})        
+        await notificationModel.updateOne({to: req.user.id}, {pings})        
 
         return res.json({
             success: true,
-            data: notifications
+            data: {
+                id: notificationId
+            }
         })
 
     } catch (err) {
