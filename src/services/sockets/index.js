@@ -1,19 +1,7 @@
 const Server = require('socket.io')
 
-
-// class Sockets {
-//     constructor(httpServer) {
-// this._io = Server(httpServer, )
-
-//         this._io.on('connection', socket => {
-//             console.log("Connection")
-//         })
-//     }
-// }
-
-// module.exports = new Sockets()
-
-Socket = {}
+Socket = {  }
+Socket.ids = new Array()
 
 Socket.init = (httpServer) => {
     Socket.io = Server(httpServer, {
@@ -23,21 +11,36 @@ Socket.init = (httpServer) => {
         }
     })
 
+    Socket.io.use((socket, next) => {
+        const userId = socket.handshake.auth.userId
+        if (!userId) {
+            return next(new Error("Invalid userId"))
+        }
+
+        socket.userId = userId
+        next()
+    })
+
     Socket.io.on('connection', (socket) => {
+        console.log('Connected', socket.handshake.auth)
+
         socket.emit('PING', 'FROM SERVER')
-        socket.on('SET_USER_ID', data => {
-            socket.userId = data.id
+
+        socket.on('connect_error', (err) => {
+            console.error(err)
         })
     })
 }
 
 Socket.sendMessage = (msgType, msg, userId) => {
     const sockets = CheckSockets()
-    sockets.some(socket => {
-        if (socket.userId === userId) {
+    if (!userId) return
+    sockets.forEach((socket) => {
+        console.log(socket.userId)
+        if (socket.userId == userId) {
+            console.log(socket.userId, userId)
             socket.emit(msgType, msg)
         }
-        return socket.userId == userId
     })
 }
 

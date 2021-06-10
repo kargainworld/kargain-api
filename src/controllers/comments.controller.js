@@ -48,7 +48,7 @@ exports.createComment = async (req, res, next) => {
             sender: req.user,
             message: message,
             action: announce_link
-        })
+        }, announce.user)
 
         return res.json({
             success: true,
