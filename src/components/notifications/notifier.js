@@ -22,6 +22,28 @@ const postNotification = ({
     })
 }
 
+const getNotificationsAndCount = async ({userId}) => {
+    try {
+        const result = await notificationModel.findOne({
+            to: userId
+        })
+        const data = {
+            data: [],
+            count: 0
+        }
+        
+        if(result) {
+            data.data = result.pings;
+            data.count = data.data.filter(item => !item.opened).length
+        }
+
+        return data
+    } catch (error) {
+        throw new Error(error.message)
+    }
+}
+
 module.exports = {
-    postNotification
+    postNotification,
+    getNotificationsAndCount
 }
