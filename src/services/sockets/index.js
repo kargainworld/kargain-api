@@ -2,6 +2,7 @@ const Server = require('socket.io')
 const notificationsController = require('../../controllers/notifications.controller')
 const conversationsController = require('../../controllers/conversations.controller')
 const notifier = require('../../components/notifications/notifier')
+const config = require('../../config')
 
 Socket = {}
 Socket.ids = new Array()
@@ -53,7 +54,7 @@ Socket.init = (httpServer) => {
                     })
                 }
                 // console.log(this)
-                notifier.postNotification({ uid: to, message, action: '', socket })
+                notifier.postNotification({ uid: to, message, action: `${config.frontend}/profile/messages`, socket })
             } catch (error) {
                 console.trace(error)
             }
