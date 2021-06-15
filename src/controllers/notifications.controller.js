@@ -48,7 +48,7 @@ exports.setOpenNotification = async ({ id }) => {
     if (!id) return Messages.errors.user_not_found
 
     try {
-        await notificationModel.updateOne({ to: id, 'pings.opened': false }, { $set: { 'pings.$.opened': true } })
+        await notificationModel.updateMany({ to: id, 'pings.opened': false }, { $set: { 'pings.$[].opened': true } })
     } catch (err) {
         console.log(err)
     }

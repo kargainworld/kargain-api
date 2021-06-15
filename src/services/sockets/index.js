@@ -32,6 +32,8 @@ Socket.init = (httpServer) => {
         Socket.sendBroadCast('SET_ONLINE_STATUS', socket)
         socket.emit('PING', 'FROM SERVER')
 
+        socket.emit('GET_ONLINE_USERS', Socket.getOnlineStatus(socket.userId))
+
         socket.on('connect_error', (err) => {
             console.error(err)
         })
@@ -65,6 +67,17 @@ Socket.init = (httpServer) => {
 
 Socket.sendBroadCast = (type, target) => {
     target.broadcast.emit(type, target.userId)
+}
+
+Socket.getOnlineStatus = (userId) => {
+    const sockets = CheckSockets()
+
+    const userIds = []
+    sockets.forEach(socket => {
+        if (socket.userId !== userId) userIds.push(socket.userId)
+    })
+
+    return userIds
 }
 
 Socket.sendMessage = (msgType, msg, userId) => {
