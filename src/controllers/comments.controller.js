@@ -44,12 +44,12 @@ exports.createComment = async (req, res, next) => {
                 message: 'Comment Added',
                 action: announce_link
             })
-  
-            sockets.sendMessage("GET_NOTIFICATION", {
-                sender: req.user,
-                message: message,
-                action: announce_link
-            }, announce.user)
+
+            const notifications = await notifier.getNotificationsAndCount({
+                userId: announceDoc.user
+            })
+
+            sockets.sendMessage("GET_NOTIFICATION", notifications, announceDoc.user)
         }
         return res.json({
             success: true,
