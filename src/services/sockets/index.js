@@ -6,6 +6,7 @@ const config = require('../../config')
 
 Socket = {}
 Socket.ids = new Array()
+Socket.currentSocket = null;
 
 Socket.init = (httpServer) => {
     Socket.io = Server(httpServer, {
@@ -27,6 +28,8 @@ Socket.init = (httpServer) => {
     })
 
     Socket.io.on('connection', (socket) => {
+        Socket.currentSocket = socket;
+
         console.log('Connected', socket.handshake.auth)
         // Socket.io.broadcast.emit('SET_ONLINE_STATUS',)
         Socket.sendBroadCast('SET_ONLINE_STATUS', socket)

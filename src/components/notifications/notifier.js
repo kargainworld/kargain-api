@@ -19,9 +19,9 @@ const postNotification = async ({
             { runValidators: true, upsert: true }
         )
 
-        if (socket) {
+        if (socket && socket !== null) {
             getNotificationsAndCount({ userId: uid }).then(data => {
-                socket.to(uid).emit('GET_NOTIFICATION', data)
+                socket.sendMessage('GET_NOTIFICATION', data, uid)
             })
         }
 

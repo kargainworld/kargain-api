@@ -7,21 +7,24 @@ const AnnounceModel = require('../models').Announce
 const NewsletterSubscriber = require('../models').NewsletterSubscriber
 const ContactMessage = require('../models').ContactMessage
 const usersMailer = require('../components/mailer').users
+const socket = require('../services/sockets');
+const config = require('../config')
+const notifier = require('../components/notifications/notifier')
 
 exports.getUsersAdminAction = async (req, res, next) => {
     const page = (req.query.page && parseInt(req.query.page) > 0) ? parseInt(req.query.page) : 1
     let size = 50
-    
+
     let sorters = {
         createdAt: -1
     }
-    
+
     if (req.query.size && parseInt(req.query.size) > 0 && parseInt(req.query.size) < 500) {
         size = parseInt(req.query.size)
     }
-    
+
     const skip = (size * (page - 1) > 0) ? size * (page - 1) : 0
-    
+
     try {
         const total = await UserModel.estimatedDocumentCount().exec()
         const rows = await UserModel
@@ -34,7 +37,7 @@ exports.getUsersAdminAction = async (req, res, next) => {
             .skip(skip)
             .sort(sorters)
             .limit(size)
-        
+
         const data = {
             page: page,
             pages: Math.ceil(total / size),
@@ -52,21 +55,22 @@ exports.getUserByUsername = async (req, res, next) => {
     const username = req.params.username
     const isSelf = req.user?.username === username
     const isAdmin = req.user?.isAdmin
-    
+
     //means visitor
     const garageFilters = (!isSelf && !isAdmin) ? {
         activated: true,
         visible: true,
         status: 'active'
     } : {}
-    
+
     try {
         const user = await UserModel.findOne({
             username,
             $or: [
                 { removed: false },
                 { removed: { $exists: false } }
-            ]}
+            ]
+        }
         )
             .populate({
                 path: 'favorites',
@@ -88,9 +92,9 @@ exports.getUserByUsername = async (req, res, next) => {
                 populate: 'user comments',
                 match: garageFilters
             })
-        
-        if (!user) {return next(Errors.NotFoundError(Messages.errors.user_not_found))}
-        
+
+        if (!user) { return next(Errors.NotFoundError(Messages.errors.user_not_found)) }
+
         return res.json({
             success: true,
             data: {
@@ -105,7 +109,7 @@ exports.getUserByUsername = async (req, res, next) => {
 }
 
 exports.saveAuthedUser = async (req, res, next) => {
-    if (!req.user) {return next(Errors.UnAuthorizedError(Messages.errors.user_not_found))}
+    if (!req.user) { return next(Errors.UnAuthorizedError(Messages.errors.user_not_found)) }
     try {
         const doc = await req.user.save()
         return res.status(200).json({ success: true, data: doc })
@@ -117,7 +121,7 @@ exports.saveAuthedUser = async (req, res, next) => {
 exports.saveUserByUsername = async (req, res, next) => {
     try {
         const user = await UserModel.findOne({ username: req.params.username })
-        if (!user) {return next(Errors.NotFoundError(Messages.errors.user_not_found))}
+        if (!user) { return next(Errors.NotFoundError(Messages.errors.user_not_found)) }
         const doc = await user.save()
         return res.status(200).json({ success: true, data: doc })
     } catch (err) {
@@ -126,8 +130,8 @@ exports.saveUserByUsername = async (req, res, next) => {
 }
 
 exports.updateUser = async (req, res, next) => {
-    if (!req.user) {return next(Errors.UnAuthorizedError(Messages.errors.user_not_found))}
-    
+    if (!req.user) { return next(Errors.UnAuthorizedError(Messages.errors.user_not_found)) }
+
     const allowedFieldsUpdatesSet = [
         'firstname',
         'lastname',
@@ -146,13 +150,13 @@ exports.updateUser = async (req, res, next) => {
         'address.fullAddress',
         'address.country'
     ]
-    
+
     const updatesSet = allowedFieldsUpdatesSet.reduce((carry, key) => {
         const value = functions.resolveObjectKey(req.body, key)
-        if (value) {return { ...carry, [key]: value }}
-        else {return carry}
+        if (value) { return { ...carry, [key]: value } }
+        else { return carry }
     }, {})
-    
+
     try {
         const doc = await UserModel.updateOne(
             {
@@ -174,8 +178,8 @@ exports.updateUser = async (req, res, next) => {
 
 exports.updateAdminUser = async (req, res, next) => {
     const { username } = req.params
-    if (!username) {return next(Errors.NotFoundError(Messages.errors.user_not_found))}
-    
+    if (!username) { return next(Errors.NotFoundError(Messages.errors.user_not_found)) }
+
     //TODO email notifications
     try {
         const doc = await UserModel.updateOne(
@@ -186,7 +190,7 @@ exports.updateAdminUser = async (req, res, next) => {
                 runValidators: true
             }
         )
-    
+
         return res.json({
             success: true,
             data: doc
@@ -197,9 +201,9 @@ exports.updateAdminUser = async (req, res, next) => {
 }
 
 exports.uploadAvatar = async (req, res, next) => {
-    if (!req.user) {return next(Errors.UnAuthorizedError(Messages.errors.user_not_found))}
+    if (!req.user) { return next(Errors.UnAuthorizedError(Messages.errors.user_not_found)) }
     req.user.avatar = req.uploadedFiles?.avatar?.[0]
-    
+
     try {
         const document = await req.user.save()
         return res.json({ success: true, data: document })
@@ -211,8 +215,8 @@ exports.uploadAvatar = async (req, res, next) => {
 exports.deleteUser = async (req, res, next) => {
     try {
         const username = req.params.username;
-        const doc = await UserModel.findOne({username});
-        await UserModel.deleteOne({username});
+        const doc = await UserModel.findOne({ username });
+        await UserModel.deleteOne({ username });
         await AnnounceModel.deleteMany({ user: doc._id })
         return res.json({ success: true })
         // return res.json({ success: true, data: doc })
@@ -222,13 +226,13 @@ exports.deleteUser = async (req, res, next) => {
 }
 
 exports.addFavoriteAnnounceAction = async (req, res, next) => {
-    if (!req.user) {return next(Errors.UnAuthorizedError(Messages.errors.user_not_found))}
+    if (!req.user) { return next(Errors.UnAuthorizedError(Messages.errors.user_not_found)) }
     const { announce_id: announceId } = req.params
     const announce = await AnnounceModel.findById(announceId)
-    
-    if (!announce) {return next(Errors.NotFoundError(Messages.errors.announce_not_found))}
-    if (req.user.id.toString() === announce.user.toString()) {return next(Errors.Error(Messages.errors.not_allowed))}
-    
+
+    if (!announce) { return next(Errors.NotFoundError(Messages.errors.announce_not_found)) }
+    if (req.user.id.toString() === announce.user.toString()) { return next(Errors.Error(Messages.errors.not_allowed)) }
+
     try {
         const insertion = await UserModel.updateOne(
             {
@@ -243,7 +247,7 @@ exports.addFavoriteAnnounceAction = async (req, res, next) => {
                 runValidators: true
             }
         )
-        
+
         return res.json({
             success: true,
             data: insertion
@@ -254,12 +258,12 @@ exports.addFavoriteAnnounceAction = async (req, res, next) => {
 }
 
 exports.rmFavoriteAnnounceAction = async (req, res, next) => {
-    if (!req.user) {return next(Errors.UnAuthorizedError(Messages.errors.user_not_found))}
-    
+    if (!req.user) { return next(Errors.UnAuthorizedError(Messages.errors.user_not_found)) }
+
     const { announce_id: announceId } = req.params
     const announce = await AnnounceModel.findById(announceId)
-    if (!announce) {return next(Errors.NotFoundError(Messages.errors.announce_not_found))}
-    
+    if (!announce) { return next(Errors.NotFoundError(Messages.errors.announce_not_found)) }
+
     try {
         const suppression = await UserModel.updateOne(
             { _id: req.user.id },
@@ -272,7 +276,7 @@ exports.rmFavoriteAnnounceAction = async (req, res, next) => {
                 runValidators: true
             }
         )
-        
+
         return res.json({
             success: true,
             data: suppression
@@ -284,9 +288,9 @@ exports.rmFavoriteAnnounceAction = async (req, res, next) => {
 
 exports.followUserAction = async (req, res, next) => {
     const { user_id: userId } = req.params
-    if (!req.user) {return next(Errors.UnAuthorizedError(Messages.errors.user_not_found))}
-    if (req.user.id.toString() === userId) {return next(Errors.Error(Messages.errors.not_allowed))}
-    
+    if (!req.user) { return next(Errors.UnAuthorizedError(Messages.errors.user_not_found)) }
+    if (req.user.id.toString() === userId) { return next(Errors.Error(Messages.errors.not_allowed)) }
+
     try {
         const insertion = await UserModel.updateOne(
             { _id: userId },
@@ -301,8 +305,17 @@ exports.followUserAction = async (req, res, next) => {
                 runValidators: true
             }
         )
-        
-        if (!insertion) {return next(Errors.NotFoundError(Messages.errors.user_not_found))}
+
+        if (!insertion) { return next(Errors.NotFoundError(Messages.errors.user_not_found)) }
+
+        await notifier.postNotification({
+            uid: userId,
+            message: `${req.user.firstname} is following you`,
+            action: `${config.frontend}/profile/${req.body.action}`,
+            socket: socket
+        })
+
+
         const doc = await UserModel.updateOne(
             { _id: req.user.id },
             {
@@ -312,7 +325,7 @@ exports.followUserAction = async (req, res, next) => {
                     }
                 }
             })
-        
+
         return res.json({
             success: true,
             data: {
@@ -327,9 +340,9 @@ exports.followUserAction = async (req, res, next) => {
 
 exports.unFollowUserAction = async (req, res, next) => {
     const { user_id: userId } = req.params
-    if (!req.user) {return next(Errors.UnAuthorizedError(Messages.errors.user_not_found))}
-    if (req.user.id.toString() === userId) {return next(Errors.Error(Messages.errors.not_allowed))}
-    
+    if (!req.user) { return next(Errors.UnAuthorizedError(Messages.errors.user_not_found)) }
+    if (req.user.id.toString() === userId) { return next(Errors.Error(Messages.errors.not_allowed)) }
+
     try {
         const suppression = await UserModel.updateOne(
             { _id: userId },
@@ -344,8 +357,16 @@ exports.unFollowUserAction = async (req, res, next) => {
                 runValidators: true
             }
         )
-        
-        if (!suppression) {return next(Errors.NotFoundError(Messages.errors.user_not_found))}
+
+        if (!suppression) { return next(Errors.NotFoundError(Messages.errors.user_not_found)) }
+
+        await notifier.postNotification({
+            uid: userId,
+            message: `${req.user.firstname} is unfollowed you`,
+            action: `${config.frontend}/profile/${req.body.action}`,
+            socket: socket
+        })
+
         const doc = await UserModel.updateOne(
             { _id: req.user.id },
             {
@@ -356,7 +377,7 @@ exports.unFollowUserAction = async (req, res, next) => {
                 }
             }
         )
-        
+
         return res.json({
             success: true,
             data: {
@@ -371,8 +392,8 @@ exports.unFollowUserAction = async (req, res, next) => {
 
 exports.subscribeNewsletter = async (req, res, next) => {
     const email = req.body.email
-    if (!email) {return next(Errors.NotFoundError(Messages.errors.missing_or_invalid_email))}
-    
+    if (!email) { return next(Errors.NotFoundError(Messages.errors.missing_or_invalid_email)) }
+
     try {
         const doc = await NewsletterSubscriber.updateOne({ email }, {
             email,
@@ -386,15 +407,15 @@ exports.subscribeNewsletter = async (req, res, next) => {
 
 exports.contact = async (req, res, next) => {
     const { email, subject, message } = req.body
-    if (!email) {return next(Errors.NotFoundError(Messages.errors.missing_or_invalid_email))}
-    
+    if (!email) { return next(Errors.NotFoundError(Messages.errors.missing_or_invalid_email)) }
+
     try {
         const post = new ContactMessage({
             email,
             subject,
             message
         })
-        
+
         const doc = await post.save()
         const date = moment(doc.createdAt).format('YYYY-MM-DD-HH-MM')
         await usersMailer.contactFormToAdmin({
@@ -403,7 +424,7 @@ exports.contact = async (req, res, next) => {
             message,
             date
         })
-        
+
         return res.json({
             success: true
         })
