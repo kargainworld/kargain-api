@@ -218,7 +218,10 @@ exports.deleteAvatar = async (req, res, next) => {
     try {
         const userId = req.params.user_id;
         const doc = await UserModel.findOne({ _id: userId });
-        // ToDo remove Avatar....
+        await Media.deleteOne({ _id: doc.avatar.id });
+        await doc.update({avatar: null});
+        doc.avatar = null;
+        return res.json({ success: true, data: doc })
     } catch (err) {
         return next(err)
     }
