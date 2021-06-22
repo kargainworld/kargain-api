@@ -6,6 +6,7 @@ const UserModel = require('../models').User
 const AnnounceModel = require('../models').Announce
 const NewsletterSubscriber = require('../models').NewsletterSubscriber
 const ContactMessage = require('../models').ContactMessage
+const Media = require('../models').Media
 const usersMailer = require('../components/mailer').users
 const socket = require('../services/sockets');
 const config = require('../config')
@@ -209,6 +210,17 @@ exports.uploadAvatar = async (req, res, next) => {
         return res.json({ success: true, data: document })
     } catch (err) {
         next(err)
+    }
+}
+
+// deleteAvatar
+exports.deleteAvatar = async (req, res, next) => {
+    try {
+        const userId = req.params.user_id;
+        const doc = await UserModel.findOne({ _id: userId });
+        // ToDo remove Avatar....
+    } catch (err) {
+        return next(err)
     }
 }
 

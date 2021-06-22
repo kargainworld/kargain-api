@@ -210,7 +210,7 @@ UserSchema.pre('save', async function (next) {
         if (!user.avatarUrl) {
             const md5 = crypto.createHash('md5').update(this.email)
                 .digest('hex')
-            user.avatarUrl = 'https://gravatar.com/avatar/' + md5 + '?s=64&d=wavatar'
+            user.avatarUrl = 'https://gravatar.com/avatar/' + md5 + '?s=64&d=retro'
         }
         
         next()
