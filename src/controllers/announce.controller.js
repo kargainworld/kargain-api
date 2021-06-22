@@ -10,6 +10,7 @@ const prepareFilters = require('../components/filters/prepareFilters')
 const announcesSorterMapper = require('../components/filters/announcesSorterMapper')
 const AnnounceMailer = require('../components/mailer').announces
 const notifier = require('../components/notifications/notifier')
+const sockets = require('../services/sockets')
 
 const DEFAULT_RESULTS_PER_PAGE = 10
 
@@ -553,9 +554,10 @@ exports.addUserLikeActionAction = async (req, res, next) => {
 
         const announce_link = `${config.frontend}/announces/${updatedAnnounce.toObject().slug}`
         await notifier.postNotification({
-            uid : updatedAnnounce.user,
-            message : 'Announce updated',
-            action : announce_link
+            uid: updatedAnnounce.user,
+            message: `${req.user.firstname} likes your announce`,
+            action: announce_link,
+            socket: sockets
         })
 
         return res.json({
