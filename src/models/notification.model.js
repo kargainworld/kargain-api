@@ -13,6 +13,10 @@ const NotificationSchema = new mongoose.Schema({
             opened : {
                 type : Boolean,
                 default : false
+            },
+            createdAt: {
+                type: Date,
+                default : new Date().getTime()
             }
         }
     ]

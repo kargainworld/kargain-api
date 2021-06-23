@@ -6,10 +6,13 @@ exports.getCurrentUserNotifications = async (req, res, next) => {
     if (!req.user) { return next(Errors.UnAuthorizedError(Messages.errors.user_not_found)) }
     try {
         const notifications = await notificationModel.findOne({ to: req.user.id })
-
+        const data = {
+            ...notifications,
+            pings: notifications.pings.sort((a,b) => b.createdAt - a.createdAt)
+        }
         return res.json({
             success: true,
-            data: notifications
+            data: data
         })
     } catch (err) {
         next(err)
