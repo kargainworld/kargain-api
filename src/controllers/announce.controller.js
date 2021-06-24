@@ -10,6 +10,7 @@ const prepareFilters = require('../components/filters/prepareFilters')
 const announcesSorterMapper = require('../components/filters/announcesSorterMapper')
 const AnnounceMailer = require('../components/mailer').announces
 const notifier = require('../components/notifications/notifier')
+const sockets = require('../services/sockets')
 
 const DEFAULT_RESULTS_PER_PAGE = 10
 
@@ -553,9 +554,10 @@ exports.addUserLikeActionAction = async (req, res, next) => {
 
         const announce_link = `${config.frontend}/announces/${updatedAnnounce.toObject().slug}`
         await notifier.postNotification({
-            uid : updatedAnnounce.user,
-            message : 'Announce updated',
-            action : announce_link
+            uid: updatedAnnounce.user,
+            message: `${req.user.firstname} likes your announce`,
+            action: announce_link,
+            socket: sockets
         })
 
         return res.json({
@@ -571,22 +573,31 @@ exports.removeUserLikeActionAction = async (req, res, next) => {
     if (!req.user) {return next(Errors.UnAuthorizedError(Messages.errors.user_not_found))}
     const { announce_id } = req.params
     try {
-        const suppressionLike = await AnnounceModel.updateOne(
-            { _id: announce_id },
+        const suppressionLike = await AnnounceModel.findByIdAndUpdate(
+            announce_id,
             { $pull: { likes: { user : mongoose.Types.ObjectId(req.user.id) } } },
             { runValidators: true }
         )
-        const suppressionFavorite = await UserModel.updateOne(
+        await UserModel.updateOne(
             { _id: req.user.id },
             { $pull: { favorites: announce_id } },
             { runValidators: true }
         )
+        
+        const announce_link = `${config.frontend}/announces/${suppressionLike.toObject().slug}`
+
+        await notifier.postNotification({
+            uid: suppressionLike.user,
+            message: `${req.user.firstname} unlikes your announce`,
+            action: announce_link,
+            socket: sockets
+        })
 
         return res.json({
             success: true,
             data: {
-                suppressionLike,
-                suppressionFavorite
+                // suppressionLike,
+                // suppressionFavorite
             }
         })
     } catch (err) {

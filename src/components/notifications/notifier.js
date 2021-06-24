@@ -15,13 +15,13 @@ const postNotification = async ({
 
         const result = await notificationModel.updateMany(
             { to: mongoose.Types.ObjectId(uid) },
-            { $addToSet: { pings: { message, action } } },
+            { $addToSet: { pings: { message, action, createdAt: new Date().getTime() } } },
             { runValidators: true, upsert: true }
         )
 
-        if (socket) {
+        if (socket && socket !== null) {
             getNotificationsAndCount({ userId: uid }).then(data => {
-                socket.to(uid).emit('GET_NOTIFICATION', data)
+                socket.sendMessage('GET_NOTIFICATION', data, uid)
             })
         }
 
@@ -42,7 +42,7 @@ const getNotificationsAndCount = async ({ userId }) => {
         }
 
         if (result) {
-            data.data = result.pings;
+            data.data = result.pings.sort((a,b) => b.createdAt - a.createdAt);
             data.count = data.data.filter(item => !item.opened).length
         }
 

@@ -21,6 +21,12 @@ router.get('/username/:username',
     usersController.getUserByUsername
 )
 
+router.get('/remove/avatar/:user_id',
+    corsMiddleware.manualCors,
+    authMiddleware.byPassAuth(),
+    usersController.deleteAvatar
+)
+
 router.options('/save', cors(corsMiddleware.authedCors)) // enable pre-flights
 router.put('/save',
     corsMiddleware.manualCors,
