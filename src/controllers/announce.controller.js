@@ -320,18 +320,17 @@ exports.createAnnounceAction = async (req, res, next) => {
             matchMake = await modelMake.findOne({
                 _id : mongoose.Types.ObjectId(manufacturer?.make?.value)
             })
-
-            if(modelModel && manufacturer?.year?.value){
+            if(modelModel && manufacturer?.year){
                 matchModel = await modelModel.findOne({
-                    _id : mongoose.Types.ObjectId(manufacturer?.year?.value)
+                    _id : mongoose.Types.ObjectId(manufacturer?.model?.value)
                 })
             }
         }
-
+        
         const manufacturerTitle = [
             manufacturer?.make?.label,
             manufacturer?.model?.label,
-            manufacturer?.year?.label
+            manufacturer?.year
         ].filter(part => part).join(' - ')
 
         let data = {
@@ -355,8 +354,6 @@ exports.createAnnounceAction = async (req, res, next) => {
                 model : matchModel?._id
             }
         }
-
-        console.log(data)
 
         const announce = new AnnounceModel(data)
         const doc = await announce.save()
