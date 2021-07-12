@@ -72,7 +72,7 @@ const AnnounceSchema = new mongoose.Schema({
     vehicleType: {
         type: String,
         required: true,
-        enum : ['car', 'moto', 'bus', 'camper', 'utility']
+        enum : ['car', "moto", 'motorcycle', 'bus', 'camper', 'utility', "truck"]
     },
 
     // e:g moto => quad, scooter ...
@@ -157,7 +157,7 @@ const AnnounceSchema = new mongoose.Schema({
             value: String
         },
         year: {
-            label: String,
+            type: Number,
             value: String
         }
     },
