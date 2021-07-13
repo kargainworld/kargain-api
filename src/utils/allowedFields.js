@@ -18,6 +18,7 @@ module.exports = [
     'consumptionRoad',
     'consumptionGkm',
     'mileage',
+    'mileageType',
     'equipments',
     'damages',
     'doors',

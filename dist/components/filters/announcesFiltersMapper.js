@@ -39,6 +39,9 @@ module.exports = {
     type: 'range',
     ref: 'mileage'
   },
+  MILEAGE_TYPE: {
+    ref: 'mileageType.value'
+  },
   POWER_KW: {
     type: 'range',
     ref: 'powerKw',

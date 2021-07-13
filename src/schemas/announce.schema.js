@@ -169,6 +169,11 @@ const AnnounceSchema = new mongoose.Schema({
         max: 999999
     },
 
+    mileageType : {
+        label: String,
+        value: String
+    },
+    
     powerKm: {
         type: Number,
         default: 0
