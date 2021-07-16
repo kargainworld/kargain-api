@@ -75,7 +75,7 @@ exports.getUserByUsername = async (req, res, next) => {
         )
             .populate({
                 path: 'favorites',
-                populate: 'comments',
+                populate: 'user comments',
                 match: garageFilters
             })
             .populate({

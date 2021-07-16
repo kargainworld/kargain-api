@@ -142,6 +142,14 @@ var AnnounceSchema = new mongoose.Schema({
     min: 0,
     max: 999999
   },
+  mileageType : {
+      label: String,
+      value: String
+  },
+  vehicleEngineGas: {
+    label: String,
+    value: String
+  },
   powerKm: {
     type: Number,
     "default": 0
