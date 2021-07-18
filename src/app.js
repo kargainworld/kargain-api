@@ -9,9 +9,9 @@ const routes = require('./routes')
 const app = express()
 
 app.use(helmet())
-app.use(bodyParser.json())
+app.use(bodyParser.json({ limit: '500mb' }))
 app.use(cookieParser())
-app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.urlencoded({ limit: '500mb', extended: true }))
 // eslint-disable-next-line no-undef
 app.use(express.static(path.join(__dirname, '../', 'public')))
 app.set('trust proxy', 1) // trust first proxy
