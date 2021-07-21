@@ -81,6 +81,7 @@ exports.createUserSubscription = async (req, res, next) => {
         
         const docPayment = await payment.save()
         
+        req.user.subscriptionOfferMaxAnnounces = offer.maxAnnounces
         req.user.subscription = docPayment.id
         req.user.hasProPlan = true
         
