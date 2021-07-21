@@ -79,12 +79,13 @@ const UserSchema = new mongoose.Schema({
     },
     
     //STRIPE
-    subscriptionLog: {
+    subscription: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Payment',
         autopopulate: true
     },
     subscriptionOfferTitle: String,
+    subscriptionOfferMaxAnnounces: Number,
     hasProPlan: {
         type: Boolean,
         default: false

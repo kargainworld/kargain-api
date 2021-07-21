@@ -149,7 +149,8 @@ exports.updateUser = async (req, res, next) => {
         'address.postCode',
         'address.city',
         'address.fullAddress',
-        'address.country'
+        'address.country',
+        'subscriptionOfferMaxAnnounces'
     ]
 
     const updatesSet = allowedFieldsUpdatesSet.reduce((carry, key) => {
