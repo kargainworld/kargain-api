@@ -208,14 +208,16 @@ exports.filterAnnouncesAction = (fetchProfile = false, fetchFeed = false, return
             .filter(row => makesFilter.length ? makesFilter.includes(row.manufacturer?.make?.make_slug) : true)
             .filter(row => modelsFilter.length ? modelsFilter.includes(row.manufacturer?.model?.model) : true)
 
-        const total = await AnnounceModel.find(query).count()
+        const total = await AnnounceModel
+            .find(query)
+            .count()
 
         const data = {
             page,
             size,
             query,
             pages: Math.ceil(total / size),
-            total : filtered.length,
+            total,
             rows : !returnCount ? filtered : null
         }
 
