@@ -24,6 +24,11 @@ const conversationModel = new mongoose.Schema({
         ref: 'User',
         required: true
     },
+    announce: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Announce',
+        required: true
+    },
     messages: [messageModel]
     
 }, {
