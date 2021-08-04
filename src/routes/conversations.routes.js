@@ -16,6 +16,11 @@ routes.get('/profile/:profileId',
     passportMiddleware.authenticate('cookie', { session: false }),
     conversationController.getConversationsWithProfile
 )
+routes.get('/profileAnnounce/:profileId/:announceId',
+    corsMiddleware.manualCors,
+    passportMiddleware.authenticate('cookie', { session: false }),
+    conversationController.getConversationsWithProfileAnnounce
+)
 
 routes.options('/', cors(corsMiddleware.authedCors)) // enable pre-flights
 routes.post('/',

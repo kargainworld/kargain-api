@@ -49,16 +49,16 @@ Socket.init = (httpServer) => {
             Socket.sendBroadCast('SET_OFFLINE_STATUS', socket)
         })
 
-        socket.on('PRIVATE_MESSAGE', async ({ message, to }) => {
+        socket.on('PRIVATE_MESSAGE', async ({ message, to, announceId }) => {
             try {
-                const result = await conversationsController.postConversationMessageFromSocket(socket.userId, to, message)
+                const result = await conversationsController.postConversationMessageFromSocket(socket.userId, to, message, announceId)
                 if (result) {
                     socket.to(to).emit('PRIVATE_MESSAGE', {
                         content: message,
-                        from: socket.userId
+                        from: socket.userId,
+                        announceId: announceId
                     })
                 }
-                // console.log(this)
                 notifier.postNotification({ uid: to, message, action: `${config.frontend}/profile/messages`, socket })
             } catch (error) {
                 console.trace(error)

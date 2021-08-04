@@ -14,6 +14,10 @@ exports.getCurrentUserConversations = async (req, res, next) => {
                 ]
             })
             .populate({
+                path: 'announce',
+                select: 'slug images title manufacturer vehicleEngineType'
+            })
+            .populate({
                 path: 'from',
                 select: 'avatarUrl firstname username lastname email'
             })
@@ -49,6 +53,52 @@ exports.getConversationsWithProfile = async (req, res, next) => {
                         to: req.user.id
                     }
                 ]
+            })
+            .populate({
+                path: 'announce',
+                select: 'slug images title manufacturer vehicleEngineType'
+            })
+            .populate({
+                path: 'from',
+                select: 'avatarUrl firstname username lastname email'
+            })
+            .populate({
+                path: 'to',
+                select: 'avatarUrl firstname username lastname email'
+            })
+
+        return res.json({
+            success: true,
+            data: conversation
+        })
+    } catch (err) {
+        return next(err)
+    }
+}
+
+exports.getConversationsWithProfileAnnounce = async (req, res, next) => {
+    if (!req.user) { return next(Errors.UnAuthorizedError(Messages.errors.user_not_found)) }
+
+    const { profileId, announceId } = req.params
+    console.log("profileId: ", profileId, announceId)
+    try {
+        const conversation = await ConversationModel.findOne(
+            {
+                announce: announceId,
+                $or: [
+                    {
+                        from: req.user.id,
+                        to: profileId
+                    },
+                    {
+                        from: profileId,
+                        to: req.user.id
+                    }
+                ]
+            })
+            .populate({
+                path: 'announce',
+                select: 'slug images title manufacturer vehicleEngineType'
             })
             .populate({
                 path: 'from',
@@ -122,14 +172,16 @@ exports.postConversationMessage = async (req, res, next) => {
     }
 }
 
-exports.postConversationMessageFromSocket = async (from, to, message) => {
+exports.postConversationMessageFromSocket = async (from, to, message, announceId) => {
 
     if (!from) { throw new Error(Errors.UnAuthorizedError(Messages.errors.user_not_found)) }
     if (!to) { throw new Error(Errors.UnAuthorizedError(Messages.errors.user_not_found)) }
+    if (!announceId) { throw new Error(Errors.UnAuthorizedError(Messages.errors.announce_not_found)) }
 
     try {
         const conversation = await ConversationModel.findOneAndUpdate(
             {
+                announce: announceId,
                 $or: [
                     {
                         from: from,
@@ -144,6 +196,7 @@ exports.postConversationMessageFromSocket = async (from, to, message) => {
             {
                 from: from,
                 to: to,
+                announce: announceId,
                 $push: {
                     messages: {
                         from: from,
@@ -156,6 +209,10 @@ exports.postConversationMessageFromSocket = async (from, to, message) => {
             {
                 new: true,
                 upsert: true
+            })
+            .populate({
+                path: 'announce',
+                select: 'slug images title manufacturer vehicleEngineType'
             })
             .populate({
                 path: 'from',
