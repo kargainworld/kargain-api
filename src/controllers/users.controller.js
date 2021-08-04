@@ -109,6 +109,36 @@ exports.getUserByUsername = async (req, res, next) => {
     }
 }
 
+exports.getUserByWallet = async (req, res, next) => {
+    const wallet = req.params.wallet
+    const isSelf = req.user?.wallet === wallet
+    const isAdmin = req.user?.isAdmin
+
+
+    try {
+        const user = await UserModel.findOne({
+            wallet,
+            $or: [
+                { removed: false },
+                { removed: { $exists: false } }
+            ]
+        })
+
+        if (!user) { return next(Errors.NotFoundError(Messages.errors.user_not_found)) }
+
+        return res.json({
+            success: true,
+            data: {
+                isAdmin,
+                isSelf,
+                user
+            }
+        })
+    } catch (err) {
+        next(err)
+    }
+}
+
 exports.saveAuthedUser = async (req, res, next) => {
     if (!req.user) { return next(Errors.UnAuthorizedError(Messages.errors.user_not_found)) }
     try {

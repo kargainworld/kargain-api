@@ -21,6 +21,12 @@ router.get('/username/:username',
     usersController.getUserByUsername
 )
 
+router.get('/wallet/:wallet',
+    corsMiddleware.manualCors,
+    authMiddleware.byPassAuth(),
+    usersController.getUserByWallet
+)
+
 router.get('/remove/avatar/:user_id',
     corsMiddleware.manualCors,
     authMiddleware.byPassAuth(),

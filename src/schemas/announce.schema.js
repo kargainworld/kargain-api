@@ -16,6 +16,11 @@ const AnnounceSchema = new mongoose.Schema({
         trim: true
     },
 
+    wallet: {
+        type: String,
+        default: true
+    },
+
     showCellPhone: {
         type: Boolean,
         default: true
