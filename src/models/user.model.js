@@ -50,6 +50,10 @@ const UserSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    wallet: {
+        type: String,
+        default: false
+    },
     email_validated: {
         type: Boolean,
         default: false
