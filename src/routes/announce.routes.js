@@ -120,4 +120,11 @@ router.post('/mailto/:slug',
     announceController.mailToShareAnnounce
 )
 
+router.options('/mailtoWithoutAuth/:slug', cors(corsMiddleware.authedCors)) // enable pre-flights
+router.post('/mailtoWithoutAuth/:slug',
+    corsMiddleware.manualCors,
+    authMiddleware.byPassAuth(),
+    announceController.mailToShareAnnounceWithoutAuth
+)
+
 module.exports = router
