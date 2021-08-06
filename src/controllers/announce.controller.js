@@ -612,12 +612,12 @@ exports.mailToShareAnnounce = async (req, res, next) => {
         const announce = await AnnounceModel.findOneAndUpdate({ slug: req.params.slug })
         if(!announce) {return Errors.NotFoundError(Messages.errors.announce_not_found)}
 
-        await AnnounceMailer.shareAnnounceLink({
-            fromFullName: (req.user ? req.user.fullname : "Guest"),
-            emailTo: req.body.email,
-            announce_link: `${config.frontend}/announces/${announce.toObject().slug}`,
-            featured_img_link: announce?.images?.[0]?.location ?? 'https://kargain.s3.eu-west-3.amazonaws.com/uploads/2020/05/30670681-d44d-468e-bf82-533733bb507e.JPG'
-        })
+        // await AnnounceMailer.shareAnnounceLink({
+        //     fromFullName: (req.user ? req.user.fullname : "Guest"),
+        //     emailTo: req.body.email,
+        //     announce_link: `${config.frontend}/announces/${announce.toObject().slug}`,
+        //     featured_img_link: announce?.images?.[0]?.location ?? 'https://kargain.s3.eu-west-3.amazonaws.com/uploads/2020/05/30670681-d44d-468e-bf82-533733bb507e.JPG'
+        // })
 
         return res.json({ success: true, data: { msg : 'sent' }})
 
@@ -632,12 +632,12 @@ exports.mailToShareAnnounceWithoutAuth = async (req, res, next) => {
         const announce = await AnnounceModel.findOneAndUpdate({ slug: req.params.slug })
         if(!announce) {return Errors.NotFoundError(Messages.errors.announce_not_found)}
 
-        await AnnounceMailer.shareAnnounceLink({
-            fromFullName: "Guest",
-            emailTo: req.body.email,
-            announce_link: `${config.frontend}/announces/${announce.toObject().slug}`,
-            featured_img_link: announce?.images?.[0]?.location ?? 'https://kargain.s3.eu-west-3.amazonaws.com/uploads/2020/05/30670681-d44d-468e-bf82-533733bb507e.JPG'
-        })
+        // await AnnounceMailer.shareAnnounceLink({
+        //     fromFullName: "Guest",
+        //     emailTo: req.body.email,
+        //     announce_link: `${config.frontend}/announces/${announce.toObject().slug}`,
+        //     featured_img_link: announce?.images?.[0]?.location ?? 'https://kargain.s3.eu-west-3.amazonaws.com/uploads/2020/05/30670681-d44d-468e-bf82-533733bb507e.JPG'
+        // })
 
         return res.json({ success: true, data: { msg : 'sent' }})
 
