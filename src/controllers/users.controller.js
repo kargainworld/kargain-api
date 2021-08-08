@@ -168,6 +168,7 @@ exports.updateUser = async (req, res, next) => {
         'lastname',
         'about',
         'phone',
+        'wallet',
         'company.name',
         'company.siren',
         'company.owner',
