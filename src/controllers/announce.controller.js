@@ -323,9 +323,21 @@ exports.createAnnounceAction = async (req, res, next) => {
                 _id : mongoose.Types.ObjectId(manufacturer?.make?.value)
             })
             if(modelModel && manufacturer?.year){
-                matchModel = await modelModel.findOne({
-                    _id : mongoose.Types.ObjectId(manufacturer?.model?.value)
-                })
+                if(vehicleType === "car"){
+                    matchModel = await modelModel.findOne({
+                        model : manufacturer?.model?.value,
+                        year: manufacturer?.year
+                    })
+                    if(!matchModel) {
+                        matchModel = await modelModel.findOne({
+                            model : manufacturer?.model?.value
+                        })
+                    }
+                } else {
+                    matchModel = await modelModel.findOne({
+                        _id : mongoose.Types.ObjectId(manufacturer?.model?.value)
+                    })
+                }
             }
         }
         
@@ -356,7 +368,6 @@ exports.createAnnounceAction = async (req, res, next) => {
                 model : matchModel?._id
             }
         }
-
         const announce = new AnnounceModel(data)
         const doc = await announce.save()
         await UserModel.findOneAndUpdate(
