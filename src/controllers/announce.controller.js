@@ -368,6 +368,15 @@ exports.createAnnounceAction = async (req, res, next) => {
                 model : matchModel?._id
             }
         }
+        
+        if(!data.phone){
+            const user = await UserModel.findOne({
+                _id: req.user.id
+                }
+            )
+            data.phone = user?.phone
+        }
+
         const announce = new AnnounceModel(data)
         const doc = await announce.save()
         await UserModel.findOneAndUpdate(
