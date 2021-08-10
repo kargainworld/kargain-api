@@ -45,7 +45,7 @@ module.exports = {
         ref: 'mileage'
     },
     MILEAGE_TYPE: {
-      ref: 'mileageType'
+      ref: 'mileageType.value'
     },
     POWER_KW: {
         type: 'range',
