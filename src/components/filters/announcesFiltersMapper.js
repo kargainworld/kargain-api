@@ -13,6 +13,10 @@ module.exports = {
     TYPE: {
         ref: 'vehicleTypeSelect.value'
     },
+    YEAR: {
+        type: 'range',
+        ref: 'manufacturer.year'
+    },
     AD_PRICE: {
         type: 'range',
         ref: 'price'
@@ -36,13 +40,12 @@ module.exports = {
     ADDRESS_CITY_POSTCODE: {
         ref : 'address.city.postcode'
     },
-    
     MILEAGE: {
         type: 'range',
         ref: 'mileage'
     },
     MILEAGE_TYPE: {
-      ref: 'mileageType.value'
+      ref: 'mileageType'
     },
     POWER_KW: {
         type: 'range',
