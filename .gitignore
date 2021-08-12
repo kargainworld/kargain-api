@@ -107,3 +107,7 @@ typings/
 .now
 .vercel
 .vercel
+
+# dist
+
+dist/
