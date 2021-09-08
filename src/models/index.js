@@ -9,6 +9,7 @@ const NewsletterSubscriber = require('./newsletter.subscriber.model')
 const ContactMessage = require('./contact.message.model')
 const Conversation = require('./conversations.model')
 const Notification = require('./notification.model')
+const Transaction = require('./transaction.model')
 
 module.exports = {
     User,
@@ -23,5 +24,6 @@ module.exports = {
     Vehicles: {
         Makes: { ...VehiclesMakesModels },
         Models: { ...VehiclesModelModels }
-    }
+    },
+    Transaction
 }
