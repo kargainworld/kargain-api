@@ -24,8 +24,8 @@ routes.put('/:announce_id/update',
 routes.options('/:announce_id', cors(corsMiddleware.authedCors)) // enable pre-flights
 routes.get('/:announce_id',
     corsMiddleware.manualCors,
-    passportMiddleware.authenticate('cookie', { session: false }),
-    rolesMiddleware.grantAccess('readAny', 'announce'),
+    // passportMiddleware.authenticate('cookie', { session: false }),
+    // rolesMiddleware.grantAccess('readAny', 'announce'),
     transactionsController.getTransactionsByAnnounceId
 )
 
