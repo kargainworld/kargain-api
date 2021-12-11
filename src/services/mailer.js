@@ -13,9 +13,9 @@ const verify = callback => {
 
 const test = callback => {
     const recipient = {
-        firstname: 'nicolas',
-        lastname: 'giraudo',
-        email: 'giraudo.nicolas13@gmail.com'
+        firstname: 'hello',
+        lastname: 'kargain',
+        email: 'hello@kargain.com'
     }
     
     const message = {
