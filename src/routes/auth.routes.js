@@ -21,7 +21,7 @@ router.post('/sso-register',
 router.options('/login', cors(corsMiddleware.authedCors))
 router.post('/login',
     corsMiddleware.manualCors,
-    authController.loginValidation,
+    // authController.loginValidation,
     passportMiddleware.authenticate('local', { session: false }),
     authController.loginAction
 )
@@ -30,7 +30,7 @@ router.options('/register', cors(corsMiddleware.clientCors))
 router.post('/register',
     cors(corsMiddleware.clientCors),
     authController.registerAction,
-    authController.sendEmailActivation
+    // authController.sendEmailActivation
 )
 
 router.options('/register-pro', cors(corsMiddleware.clientCors))

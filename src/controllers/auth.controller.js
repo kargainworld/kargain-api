@@ -54,7 +54,7 @@ exports.ssoRegister = async (req, res, next) => {
 }
 
 exports.loginAction = async (req, res, next) => {
-    if (!req.user) {return next(Errors.UnAuthorizedError(Messages.errors.user_not_found))}
+    if (!req.user.wallet) {return next(Errors.UnAuthorizedError(Messages.errors.user_not_found))}
     
     const user = req.user
     const expirationTimeSeconds = Date.now() + 1000 * 60 * 60 * 24 * 10
@@ -94,10 +94,11 @@ exports.logoutAction = async (req, res, next) => {
 }
 
 exports.registerAction = async (req, res, next) => {
-    const { email, password } = req.body
-    if (!password) {return next(Errors.Error(Messages.errors.missing_password))}
-    if (!email || !EMAIL_REGEX.test(email)) {return next(Errors.Error(Messages.errors.missing_or_invalid_email))}
-    if (!PASSWORD_REGEX.test(password)) {return next(Errors.Error(Messages.errors.password_not_valid))}
+    // const { email, password } = req.body
+    // if (!password) {return next(Errors.Error(Messages.errors.missing_password))}
+    // if (!email || !EMAIL_REGEX.test(email)) {return next(Errors.Error(Messages.errors.missing_or_invalid_email))}
+    // if (!PASSWORD_REGEX.test(password)) {return next(Errors.Error(Messages.errors.password_not_valid))}
+    const { wallet } = req.body
     
     const user = new User(req.body)
     

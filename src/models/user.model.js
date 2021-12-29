@@ -26,6 +26,13 @@ const UserSchema = new mongoose.Schema({
         type: String,
         trim: true
     },
+
+    wallet: {
+        type: String,
+        trim: true,
+        unique: true,
+        required: true
+    },
     
     email: {
         type: String,
