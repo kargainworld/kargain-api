@@ -31,9 +31,13 @@ db.on('close', function () {
 // If the Node process ends, close the Mongoose connection
 // eslint-disable-next-line no-undef
 process.on('SIGINT', function () {
-    mongoose.connection.close(function () {
-        console.log('Mongoose default connection disconnected through app termination')
-        // eslint-disable-next-line no-undef
-        return process.exit(0)
-    })
-})
+    if(process.env.NODE_ENV !== 'development') {
+        mongoose.connection.close(function () {
+            console.log('Mongoose default connection disconnected through app termination')
+            // eslint-disable-next-line no-undef
+            return process.exit(0)
+        })
+    }
+
+    process.kill(process.pid, 'SIGINT');
+}) 

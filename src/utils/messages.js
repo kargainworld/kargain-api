@@ -8,6 +8,7 @@ const messages = {
     'comment_not_found' : 'comment_not_found',
     'message_not_found' : 'message_not_found',
     'response_not_found' : 'response_not_found',
+    "missing_wallet_address": "missing_wallet_address",
     'missing_offer' : 'missing_offer',
     'missing_vehicle_model' : 'missing_vehicle_type_model',
     'missing_vehicle_make' : 'missing_make',

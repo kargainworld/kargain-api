@@ -12,7 +12,7 @@ const EMAIL_REGEX = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"
 const PASSWORD_REGEX = /^(?=.*\d).{4,16}$/ //min 4, max 8
 
 exports.findUserByEmailMiddleware = async (req, res, next) => {
-    if (!req.body.email) {return next(Errors.NotFoundError())}
+    if (!req.body.email) { return next(Errors.NotFoundError()) }
     try {
         /*eslint require-atomic-updates:0*/
         req.user = await User.findByEmail(req.body.email)
@@ -24,15 +24,15 @@ exports.findUserByEmailMiddleware = async (req, res, next) => {
 
 exports.loginValidation = (req, res, next) => {
     const { email, password } = req.body
-    if (!password) {return next(Errors.Error(Messages.errors.missing_password))}
-    if (!email || !EMAIL_REGEX.test(email)) {return next(Errors.Error(Messages.errors.missing_or_invalid_email))}
-    if (!PASSWORD_REGEX.test(password)) {return next(Errors.Error(Messages.errors.password_not_valid))}
-    else {next()}
+    if (!password) { return next(Errors.Error(Messages.errors.missing_password)) }
+    if (!email || !EMAIL_REGEX.test(email)) { return next(Errors.Error(Messages.errors.missing_or_invalid_email)) }
+    if (!PASSWORD_REGEX.test(password)) { return next(Errors.Error(Messages.errors.password_not_valid)) }
+    else { next() }
 }
 
 exports.ssoRegister = async (req, res, next) => {
     const data = req.body
-    
+
     try {
         const user = await User.findByEmail(data.email)
         if (!user) {
@@ -53,27 +53,70 @@ exports.ssoRegister = async (req, res, next) => {
     }
 }
 
-exports.loginAction = async (req, res, next) => {
-    if (!req.user.wallet) {return next(Errors.UnAuthorizedError(Messages.errors.user_not_found))}
-    
-    const user = req.user
+exports.adminLoginAction = async (req, res, next) => {
+
+    const { email, password } = req.body
+    if (!password) { return next(Errors.Error(Messages.errors.missing_password)) }
+    if (!email || !EMAIL_REGEX.test(email)) { return next(Errors.Error(Messages.errors.missing_or_invalid_email)) }
+    if (!PASSWORD_REGEX.test(password)) { return next(Errors.Error(Messages.errors.password_not_valid)) }
+
+    const user = await User.findByEmail(email);
+
+    if (!(await user.comparePassword(password))) {
+        return next(Errors.Error.apply(Messages.errors.password_not_valid))
+    }
+
+    req.user = user;
     const expirationTimeSeconds = Date.now() + 1000 * 60 * 60 * 24 * 10
     const token = jwt.sign({
         exp: Math.floor(expirationTimeSeconds / 1000), // 10days (seconds)
         uid: user._id
     },
-    config.jwt.encryption
+        config.jwt.encryption
     )
-    
+
     // Adds a new cookie to the response
     return res.cookie('token',
         token, {
-            expires: new Date(expirationTimeSeconds), // 10days (milliseconds)
-            httpOnly: true,
-            // secure: !!config.isProd,
-            sameSite: false
-        }
+        expires: new Date(expirationTimeSeconds), // 10days (milliseconds)
+        httpOnly: true,
+        // secure: !!config.isProd,
+        sameSite: false
+    }
     ).json({
+        success: true,
+        data: user
+    })
+}
+
+exports.loginAction = async (req, res, next) => {
+    if (!req.body.wallet) { return next(Errors.UnAuthorizedError(Messages.errors.missing_wallet_address)) }
+    const { wallet } = req.body;
+    let user = await User.findOne({ wallet });
+
+    if (!user) {
+        const newUser = new User(req.body)
+        user = await newUser.save()
+    }
+
+    req.user = user;
+
+    const expirationTimeSeconds = Date.now() + 1000 * 60 * 60 * 24 * 10
+    const token = jwt.sign({
+        exp: Math.floor(expirationTimeSeconds / 1000), // 10days (seconds)
+        uid: user._id
+    },
+        config.jwt.encryption
+    )
+
+    // Adds a new cookie to the response
+    return res.cookie('token',
+        token, {
+        expires: new Date(expirationTimeSeconds), // 10days (milliseconds)
+        httpOnly: true,
+        // secure: !!config.isProd,
+        sameSite: false
+    }).json({
         success: true,
         data: user
     })
@@ -84,12 +127,12 @@ exports.logoutAction = async (req, res, next) => {
     return res
         .cookie('token',
             null, {
-                maxAge: 0,
-                httpOnly: true
-            }
+            maxAge: 0,
+            httpOnly: true
+        }
         ).json({
             success: true,
-            data : 'logged out'
+            data: 'logged out'
         })
 }
 
@@ -98,33 +141,54 @@ exports.registerAction = async (req, res, next) => {
     // if (!password) {return next(Errors.Error(Messages.errors.missing_password))}
     // if (!email || !EMAIL_REGEX.test(email)) {return next(Errors.Error(Messages.errors.missing_or_invalid_email))}
     // if (!PASSWORD_REGEX.test(password)) {return next(Errors.Error(Messages.errors.password_not_valid))}
-    const { wallet } = req.body
-    
-    const user = new User(req.body)
-    
+
+    const newUser = new User(req.body)
+
     try {
-        req.user = await user.save()
-        next()
+        const user = await newUser.save();
+        req.user = user;
+
+        const expirationTimeSeconds = Date.now() + 1000 * 60 * 60 * 24 * 10
+        const token = jwt.sign({
+            exp: Math.floor(expirationTimeSeconds / 1000), // 10days (seconds)
+            uid: user._id
+        },
+            config.jwt.encryption
+        )
+
+        // Adds a new cookie to the response
+        return res.cookie('token',
+            token, {
+            expires: new Date(expirationTimeSeconds), // 10days (milliseconds)
+            httpOnly: true,
+            // secure: !!config.isProd,
+            sameSite: false
+        }
+        ).json({
+            success: true,
+            data: user
+        })
     } catch (err) {
+        console.log(err);
         return next(err)
     }
 }
 
 exports.registerProAction = async (req, res, next) => {
     const { email, password } = req.body
-    if (!password) {return next(Errors.Error(Messages.errors.missing_password))}
-    if (!email || !EMAIL_REGEX.test(email)) {return next(Errors.Error(Messages.errors.missing_or_invalid_email))}
-    if (!PASSWORD_REGEX.test(password)) {return next(Errors.Error(Messages.errors.password_not_valid))}
-    
+    if (!password) { return next(Errors.Error(Messages.errors.missing_password)) }
+    if (!email || !EMAIL_REGEX.test(email)) { return next(Errors.Error(Messages.errors.missing_or_invalid_email)) }
+    if (!PASSWORD_REGEX.test(password)) { return next(Errors.Error(Messages.errors.password_not_valid)) }
+
     const user = new User({
         ...req.body,
         pro: true
     })
-    
+
     try {
         req.user = await user.save()
         next()
-        
+
     } catch (err) {
         next(err)
     }
@@ -134,7 +198,7 @@ exports.confirmEmailTokenAction = async (req, res, next) => {
     const { token } = req.params
     try {
         const decoded = await jwt.verify(token, config.jwt.encryption)
-        if (!decoded.email) {return next(Errors.UnAuthorizedError(Messages.errors.user_not_found))}
+        if (!decoded.email) { return next(Errors.UnAuthorizedError(Messages.errors.user_not_found)) }
         const updated = await User.confirmUserEmail(decoded.email)
         return res.json({
             success: true,
@@ -146,24 +210,24 @@ exports.confirmEmailTokenAction = async (req, res, next) => {
 }
 
 exports.sendEmailActivation = async (req, res, next) => {
-    if (!req.user) {return next(Errors.NotFoundError(Messages.errors.user_not_found))}
-    
+    if (!req.user) { return next(Errors.NotFoundError(Messages.errors.user_not_found)) }
+
     const token = jwt.sign({ email: req.user.email },
         config.jwt.encryption,
         { expiresIn: '1h' }
     )
-    
+
     await authMailer.confirmAccount({
         firstname: req.user.firstname,
         lastname: req.user.lastname,
         email: req.user.email,
         link: token ? `${config.frontend}/auth/confirm-account?token=${token}` : null
     })
-    
+
     return res.json({
         success: true,
-        data : {
-            msg : Messages.success.user_successfully_registered
+        data: {
+            msg: Messages.success.user_successfully_registered
         }
     })
 }
@@ -183,10 +247,10 @@ exports.forgotPasswordAction = async (req, res, next) => {
             email: user.email
         }, config.jwt.encryption, { expiresIn: '1h' }
         )
-        
+
         user.pass_reset = uuid()
         const document = await user.save()
-        
+
         const emailResult = await authMailer.resetPassword({
             firstname: document.firstname,
             lastname: document.lastname,
@@ -194,7 +258,7 @@ exports.forgotPasswordAction = async (req, res, next) => {
             report_link: `${config.frontend}/auth/report`,
             reset_link: token ? `${config.frontend}/auth/reset-password?token=${token}` : null
         })
-        
+
         return res.json({
             success: true,
             data: emailResult
@@ -208,7 +272,7 @@ exports.resetPasswordAction = async (req, res, next) => {
     const { token, password } = req.body
     try {
         const decoded = await jwt.verify(token, config.jwt.encryption)
-        if (!decoded) {return next(Errors.NotFoundError(Messages.errors.user_not_found))}
+        if (!decoded) { return next(Errors.NotFoundError(Messages.errors.user_not_found)) }
         const { email } = decoded
         const updated = await User.resetPassword(email, password)
         return res.json({

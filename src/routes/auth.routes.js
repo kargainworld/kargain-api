@@ -22,8 +22,15 @@ router.options('/login', cors(corsMiddleware.authedCors))
 router.post('/login',
     corsMiddleware.manualCors,
     // authController.loginValidation,
-    passportMiddleware.authenticate('local', { session: false }),
+    // passportMiddleware.authenticate('local', { session: false }),
     authController.loginAction
+)
+
+router.options('/admin-login', cors(corsMiddleware.authedCors))
+router.post('/admin-login', 
+    corsMiddleware.manualCors,
+    authController.loginValidation,
+    authController.adminLoginAction
 )
 
 router.options('/register', cors(corsMiddleware.clientCors))

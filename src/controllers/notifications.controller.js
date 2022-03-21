@@ -8,7 +8,7 @@ exports.getCurrentUserNotifications = async (req, res, next) => {
         const notifications = await notificationModel.findOne({ to: req.user.id })
         const data = {
             ...notifications,
-            pings: notifications.pings.sort((a,b) => b.createdAt - a.createdAt)
+            pings: notifications?.pings.sort((a,b) => b.createdAt - a.createdAt)
         }
         return res.json({
             success: true,

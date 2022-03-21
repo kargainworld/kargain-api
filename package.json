@@ -8,7 +8,7 @@
 			"scripts": {
 						"vercel-build": "yarn run build",
 						"start": "cross-env NODE_ENV=development nodemon src",
-						"dev": "cross-env NODE_ENV=development nodemon src",
+						"dev": "cross-env NODE_ENV=development nodemon --delay 1000ms src",
 						"start:prod": "nodemon src",
 						"build": "rimraf dist && babel src -d dist",
 						"prod": "cross-env NODE_ENV=production yarn run build && nodemon dist",

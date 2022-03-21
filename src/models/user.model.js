@@ -9,16 +9,22 @@ const UserSchema = new mongoose.Schema({
     
     firstname: {
         type: String,
-        required: true,
         trim: true,
         get: v => utils.capitalizeWords(v)
     },
     
     lastname: {
         type: String,
-        required: true,
         trim: true,
         get: v => utils.capitalizeWords(v)
+    },
+
+    wallet: {
+        type: String,
+        default: false,
+        required: true,
+        trim: true,
+        unique: true,
     },
     
     //generated
@@ -26,25 +32,16 @@ const UserSchema = new mongoose.Schema({
         type: String,
         trim: true
     },
-
-    wallet: {
-        type: String,
-        trim: true,
-        unique: true,
-        required: true
-    },
     
     email: {
         type: String,
         trim: true,
         unique: true,
-        required: true
     },
     
     password: {
         type: String,
         trim: true,
-        required: true
     },
     
     salt: String,
@@ -53,14 +50,12 @@ const UserSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    
     activated: {
         type: Boolean,
         default: false
     },
-    wallet: {
-        type: String,
-        default: false
-    },
+    
     email_validated: {
         type: Boolean,
         default: false
@@ -213,14 +208,15 @@ UserSchema.post('remove', function (doc) {
 UserSchema.pre('save', async function (next) {
     const user = this
     try {
-        if (this.isNew) {
+        if (user.firstname || user.lastname) {
             const fullname = utils.stringToSlug(`${user.firstname} ${user.lastname}`)
             user.username = `${fullname}-${uuid().substr(0, 6)}`
-            user.password = await hashPassword(user.password)
+        } else {
+            user.username = uuid();
         }
         
         if (!user.avatarUrl) {
-            const md5 = crypto.createHash('md5').update(this.email)
+            const md5 = crypto.createHash('md5').update(this.wallet)
                 .digest('hex')
             user.avatarUrl = 'https://gravatar.com/avatar/' + md5 + '?s=64&d=retro'
         }
