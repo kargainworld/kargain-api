@@ -274,7 +274,7 @@ exports.getVehicleTypeMakeModels = async (req, res, next) => {
 }
 
 exports.getCarsMakeModels = async (req, res, next) => {
-    const make = req.query.make
+    const make = req.query.make         
     const carsMakesModel = require('../models').Vehicles.Makes['cars']
     let forceRewriteCache = Boolean(req.query.forceRewriteCache)
     const cacheKey = `cars_${make}`

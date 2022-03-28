@@ -36,7 +36,6 @@ const UserSchema = new mongoose.Schema({
     email: {
         type: String,
         trim: true,
-        unique: true,
     },
     
     password: {
@@ -208,12 +207,12 @@ UserSchema.post('remove', function (doc) {
 UserSchema.pre('save', async function (next) {
     const user = this
     try {
-        if (user.firstname || user.lastname) {
-            const fullname = utils.stringToSlug(`${user.firstname} ${user.lastname}`)
-            user.username = `${fullname}-${uuid().substr(0, 6)}`
-        } else {
-            user.username = uuid();
-        }
+        // if (user.firstname || user.lastname) {
+        //     const fullname = utils.stringToSlug(`${user.firstname} ${user.lastname}`)
+        //     user.username = `${fullname}-${uuid().substr(0, 6)}`
+        // } else {
+        //     user.username = uuid();
+        // }
         
         if (!user.avatarUrl) {
             const md5 = crypto.createHash('md5').update(this.wallet)
@@ -229,6 +228,7 @@ UserSchema.pre('save', async function (next) {
 
 UserSchema.post('save', async function (err, doc, next) {
     if (err) {
+        console.log(err);
         if (err.name === 'MongoError' && err.code === 11000) {
             return next(Errors.DuplicateError('duplicate user'))
         } else {return next(err)}

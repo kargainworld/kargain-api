@@ -252,7 +252,7 @@ exports.getAnnounceBySlugAction = async (req, res, next) => {
                     select: 'avatarUrl firstname username lastname email'
                 }
             })
-
+        
         if (announce) {
             const isSelf = req.user ? req?.user.id.toString() === announce.user.id.toString() : false
             const isAdmin = req.user ? req.user.isAdmin : false
@@ -271,12 +271,14 @@ exports.getAnnounceBySlugAction = async (req, res, next) => {
                 announce.visible &&
                 announce.status === 'active'
 
-            if (displayAd) {return res.json({
-                success: true,
-                data: {
-                    announce
-                }
-            })}
+            if (displayAd) {
+                return res.json({
+                    success: true,
+                    data: {
+                        announce
+                    }
+                })
+            }
         }
         return next(Errors.NotFoundError(Messages.errors.announce_not_found))
     } catch (err) {
@@ -308,7 +310,7 @@ exports.getBySlugAndNextAction = async (req, res, next) => {
 exports.createAnnounceAction = async (req, res, next) => {
     if (!req.user) {return next(Errors.UnAuthorizedError(Messages.errors.user_not_found))}
 
-    const { vehicleType, manufacturer } = req.body
+    const { vehicleType, manufacturer, vinNumber } = req.body
 
     //automatically disable announce
     // const disable = req.user.garage.length >= req.user.config.garageLengthAllowed
@@ -318,6 +320,13 @@ exports.createAnnounceAction = async (req, res, next) => {
     let matchModel = null
 
     try {
+
+        const oneAnnounce = await AnnounceModel.findOne({vinNumber});
+
+        if(oneAnnounce?._id) {
+            throw new Error('Exist VIN Number');
+        }
+
         if (modelMake && manufacturer?.make?.value){
             matchMake = await modelMake.findOne({
                 _id : mongoose.Types.ObjectId(manufacturer?.make?.value)

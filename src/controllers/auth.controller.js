@@ -96,6 +96,14 @@ exports.loginAction = async (req, res, next) => {
 
     if (!user) {
         const newUser = new User(req.body)
+        
+        if (newUser.firstname || newUser.lastname) {
+            const fullname = utils.stringToSlug(`${newUser.firstname} ${newUser.lastname}`)
+            newUser.username = `${fullname}-${uuid().substr(0, 6)}`
+        } else {
+            newUser.username = uuid();
+        }
+
         user = await newUser.save()
     }
 

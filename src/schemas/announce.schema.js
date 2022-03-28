@@ -65,7 +65,11 @@ const AnnounceSchema = new mongoose.Schema({
         max: 999999
     },
 
-    vinNumber: String,
+    vinNumber: {
+        type: String,
+        unique: true,
+        required: true
+    },
 
     adType: {
         type: String,
